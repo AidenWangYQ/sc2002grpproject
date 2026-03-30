@@ -1,11 +1,65 @@
-# Mac
+# =========================
+# OS FILES (macOS)
+# =========================
 .DS_Store
+.AppleDouble
+.LSOverride
 
-# Maven
+# =========================
+# MAVEN / BUILD OUTPUT
+# =========================
 target/
+*.class
+*.jar
+*.war
+*.ear
 
+# =========================
+# LOG FILES
+# =========================
+*.log
+
+# =========================
 # VSCode
+# =========================
 .vscode/
 
-# Logs
-*.log
+# =========================
+# IntelliJ (just in case teammates use it)
+# =========================
+.idea/
+*.iml
+
+# =========================
+# ENV / LOCAL SETTINGS
+# =========================
+.env
+*.env
+
+# =========================
+# TEMP FILES
+# =========================
+*.tmp
+*.swp
+
+# =========================
+# TEST OUTPUT (optional)
+# =========================
+test-output/
+
+# =========================
+# COVERAGE (optional)
+# =========================
+coverage/
+
+# =========================
+# Node (if anyone accidentally adds frontend stuff)
+# =========================
+node_modules/
+
+# =========================
+# Python (your .venv showed up)
+# =========================
+.venv/
+__pycache__/
+*.pyc
