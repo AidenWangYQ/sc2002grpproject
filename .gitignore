@@ -1,0 +1,11 @@
+# Mac
+.DS_Store
+
+# Maven
+target/
+
+# VSCode
+.vscode/
+
+# Logs
+*.log
