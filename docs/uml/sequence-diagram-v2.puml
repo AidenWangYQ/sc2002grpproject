@@ -1,0 +1,102 @@
+@startuml
+title SC2002 Turn-Based Combat Arena - Sequence Diagram v2
+
+actor Player
+boundary ConsoleUI
+control GameController
+control BattleEngine
+entity Warrior
+entity Goblin
+participant BasicAttackAction
+participant DefendAction
+participant ShieldBashAction
+participant UseItemAction
+participant Potion
+participant DefendEffect
+participant StunEffect
+
+== 1. Enemy turn: Goblin executes Basic Attack on Warrior ==
+BattleEngine -> Goblin : decideAction()
+Goblin --> BattleEngine : BasicAttackAction
+BattleEngine -> BasicAttackAction : execute(Goblin, Warrior, context)
+BasicAttackAction -> Warrior : takeDamage(35 - 20)
+Warrior --> BasicAttackAction : hpUpdated
+BasicAttackAction --> BattleEngine : actionResolved
+
+== 2. Player turn: Warrior chooses Defend ==
+Player -> ConsoleUI : choose "Defend"
+ConsoleUI -> GameController : submitActionChoice("Defend")
+GameController -> BattleEngine : processPlayerAction(Warrior, DefendAction)
+BattleEngine -> DefendAction : execute(Warrior, context)
+DefendAction -> DefendEffect : create(+10 DEF, 2 rounds)
+DefendAction -> Warrior : addStatusEffect(DefendEffect)
+DefendAction --> BattleEngine : actionResolved
+
+== 3. Enemy turn: Goblin executes Basic Attack, lower damage ==
+BattleEngine -> Goblin : decideAction()
+Goblin --> BattleEngine : BasicAttackAction
+BattleEngine -> BasicAttackAction : execute(Goblin, Warrior, context)
+BasicAttackAction -> Warrior : getDefense()
+Warrior --> BasicAttackAction : 30
+BasicAttackAction -> Warrior : takeDamage(35 - 30)
+Warrior --> BasicAttackAction : hpUpdated
+BasicAttackAction --> BattleEngine : actionResolved
+
+== 4. Player turn: Warrior uses Shield Bash on Goblin ==
+Player -> ConsoleUI : choose "Shield Bash"
+ConsoleUI -> GameController : submitActionChoice("Shield Bash")
+GameController -> ConsoleUI : promptTargetChoice()
+Player -> ConsoleUI : choose Goblin
+ConsoleUI -> GameController : submitTargetChoice(Goblin)
+GameController -> BattleEngine : processPlayerAction(Warrior, ShieldBashAction, Goblin)
+BattleEngine -> ShieldBashAction : execute(Warrior, Goblin, context)
+ShieldBashAction -> Goblin : takeDamage(40 - 15)
+ShieldBashAction -> StunEffect : create(2 turns)
+ShieldBashAction -> Goblin : addStatusEffect(StunEffect)
+ShieldBashAction --> BattleEngine : actionResolved
+
+== 5. Enemy turn: Goblin is stunned, skips turn ==
+BattleEngine -> Goblin : processStartOfTurnEffects()
+BattleEngine -> Goblin : canAct()
+alt Goblin is stunned
+    BattleEngine -> Goblin : skipTurn()
+else Goblin can act
+    BattleEngine -> BasicAttackAction : execute(Goblin, Warrior, context)
+end
+
+== 6. Player turn: Warrior uses Potion ==
+Player -> ConsoleUI : choose "Potion"
+ConsoleUI -> GameController : submitActionChoice("Use Item")
+GameController -> ConsoleUI : promptItemChoice()
+Player -> ConsoleUI : choose Potion
+ConsoleUI -> GameController : submitItemChoice(Potion)
+GameController -> BattleEngine : processPlayerAction(Warrior, UseItemAction, Potion)
+BattleEngine -> UseItemAction : execute(Warrior, Potion, context)
+UseItemAction -> Potion : use(Warrior, context)
+Potion -> Warrior : heal(100)
+Potion --> UseItemAction : itemConsumed
+UseItemAction --> BattleEngine : actionResolved
+
+== 7. Enemy turn: Goblin is stunned, skips turn ==
+BattleEngine -> Goblin : processStartOfTurnEffects()
+BattleEngine -> Goblin : canAct()
+alt Goblin is stunned
+    BattleEngine -> Goblin : skipTurn()
+else Goblin can act
+    BattleEngine -> BasicAttackAction : execute(Goblin, Warrior, context)
+end
+
+== 8. Player turn: Warrior executes Basic Attack, eliminating Goblin ==
+Player -> ConsoleUI : choose "Basic Attack"
+ConsoleUI -> GameController : submitActionChoice("Basic Attack")
+GameController -> ConsoleUI : promptTargetChoice()
+Player -> ConsoleUI : choose Goblin
+ConsoleUI -> GameController : submitTargetChoice(Goblin)
+GameController -> BattleEngine : processPlayerAction(Warrior, BasicAttackAction, Goblin)
+BattleEngine -> BasicAttackAction : execute(Warrior, Goblin, context)
+BasicAttackAction -> Goblin : takeDamage(40 - 15)
+Goblin --> BasicAttackAction : hpUpdated(0)
+BasicAttackAction --> BattleEngine : actionResolved
+BattleEngine -> BattleEngine : checkBattleEnd()
+
+@enduml
