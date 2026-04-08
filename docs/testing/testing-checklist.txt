@@ -1,0 +1,82 @@
+SC2002 Turn-Based Combat Arena
+Testing edge Cases Checklist
+
+Test Case 1: HP Boundary
+
+Input:
+Warrior HP = 10
+Enemy deals 20 damage
+
+Action:
+Enemy attacks Warrior
+
+Expected Result:
+Warrior HP = 0
+HP does not go below 0
+Warrior cannot act after being defeated
+
+Test Case 2: Potion Cap
+
+Input:
+Warrior HP = 180 / 200
+
+Action:
+Warrior uses Potion (+100 HP)
+
+Expected Result:
+Warrior HP = 200
+HP does not exceed maximum HP
+
+Test Case 3: Stun Effect Duration
+
+Input:
+Goblin is hit by Shield Bash
+
+Action:
+Apply stun effect
+
+Expected Result:
+Goblin skips current turn and next turn
+After duration ends, Goblin can act normally again
+
+Test Case 4: Smoke Bomb Effect
+
+Input:
+Smoke Bomb is used
+
+Action:
+Enemy attacks during effect duration
+
+Expected Result:
+Enemy attacks deal 0 damage
+Effect lasts for current turn and next turn only
+
+Test Case 5: Cooldown Reduction
+
+Input:
+Warrior uses special skill (cooldown = 3 turns)
+
+Action:
+Other combatants take their turns
+
+Expected Result:
+Cooldown does NOT decrease
+
+Action:
+Warrior takes a turn
+
+Expected Result:
+Cooldown decreases by 1
+
+Test Case 6: Backup Spawn
+
+Input:
+All initial enemies are defeated
+
+Action:
+Next round begins
+
+Expected Result:
+Backup enemies spawn
+All backup enemies appear at the same time
+Backup does not trigger before initial enemies are defeated
