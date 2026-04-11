@@ -21,4 +21,3 @@ public class SpeedBasedTurnOrderStrategy implements TurnOrderStrategy {
         return ordered;
     }
 }
- 
