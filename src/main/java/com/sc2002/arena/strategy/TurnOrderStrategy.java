@@ -1,7 +1,8 @@
 package com.sc2002.arena.strategy;
 
-import com.sc2002.arena.model.combatant.Combatant;
 import java.util.List;
+
+import com.sc2002.arena.combatant.Combatant;
  
 /**
  * Strategy interface for determining the order in which combatants act
