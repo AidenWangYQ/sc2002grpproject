@@ -1,4 +1,4 @@
-package sc2002.battle.domain;
+package com.sc2002.battle.domain;
 
 public interface SpecialSkill {
     String getName();

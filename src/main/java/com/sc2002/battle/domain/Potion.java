@@ -1,4 +1,4 @@
-package sc2002.battle.domain;
+package com.sc2002.battle.domain;
 
 public final class Potion implements Item {
     private static final int HEAL_AMOUNT = 100;

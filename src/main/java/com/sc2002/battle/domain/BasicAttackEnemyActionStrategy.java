@@ -1,4 +1,4 @@
-package sc2002.battle.domain;
+package com.sc2002.battle.domain;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package sc2002.battle.domain;
+package com.sc2002.battle.domain;
 
 public final class DefendEffect extends AbstractStatusEffect {
     private static final int DEFENSE_BONUS = 10;

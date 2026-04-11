@@ -1,4 +1,4 @@
-package sc2002.battle.domain;
+package com.sc2002.battle.domain;
 
 public final class Warrior extends Player {
     public Warrior(Inventory inventory) {
