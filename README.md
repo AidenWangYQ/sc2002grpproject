@@ -19,16 +19,32 @@ The design emphasizes **extensibility, maintainability, and clear separation of 
 ---
 
 ## 🧱 Project Structure
-src/main/java/com/sc2002/arena/
-│
-├── action/ # Action classes (attack, defend, item use, skills)
-├── combatant/ # Player, Enemy, and base Combatant classes
-├── common/ # Shared utilities (e.g. DamageCalculator, constants)
-├── controller/ # Handles user input flow and coordination
-├── engine/ # Core battle logic (BattleEngine, managers)
-├── level/ # Level, waves, and spawning logic
-├── strategy/ # AI behavior and turn-order strategies
-└── Main.java # Entry point
+
+### 📦 Packages
+
+- **action/**
+  - Contains all action-related classes such as attacks, defense, item usage, and skills.
+
+- **combatant/**
+  - Defines core entities like `Player`, `Enemy`, and base combatant logic.
+
+- **common/**
+  - Shared utilities and helper classes (e.g., `DamageCalculator`, constants).
+
+- **controller/**
+  - Handles user input and coordinates interactions between UI and game logic.
+
+- **engine/**
+  - Core battle system logic including `BattleEngine`, `TurnManager`, and effect handling.
+
+- **level/**
+  - Manages game progression, including levels, waves, and enemy spawning.
+
+- **strategy/**
+  - Implements AI behavior and turn-order strategies.
+
+- **Main.java**
+  - Entry point of the application.
 
 
 ---
