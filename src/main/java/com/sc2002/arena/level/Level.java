@@ -1,5 +1,5 @@
 package com.sc2002.arena.level;
-
+import com.sc2002.arena.level.Wave;
 /**
  * Describes one difficulty level: its initial enemy wave and an optional
  * backup wave that spawns after the initial wave is fully defeated.

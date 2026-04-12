@@ -1,7 +1,7 @@
 package com.sc2002.arena.engine;
 import com.sc2002.arena.model.combatant.Combatant;
 import com.sc2002.arena.strategy.TurnOrderStrategy;
- 
+import sc2002.battle.domain.Combatant;
 import java.util.List;
  
 /**

@@ -11,7 +11,6 @@ public interface StatusEffect {
 
     default void onTurnEnd(Combatant target, BattleContext context) {
     }
-
     default void onRoundEnd(Combatant target, BattleContext context) {
     }
 

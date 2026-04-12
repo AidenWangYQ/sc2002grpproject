@@ -1,8 +1,15 @@
 package com.sc2002.battle.domain;
+import sc2002.battle.domain.Combatant;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import sc2002.battle.domain.DamageEvent;
+import sc2002.battle.domain.HealEvent;
+import sc2002.battle.domain.EffectEvent;
+import sc2002.battle.domain.DefeatEvent;
+import sc2002.battle.domain.ConsumedItem;
+import sc2002.battle.domain.CooldownChange;
 
 public final class ActionResult {
     private final Combatant actor;

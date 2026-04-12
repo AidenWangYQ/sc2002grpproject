@@ -1,5 +1,7 @@
 package com.sc2002.battle.domain;
-
+import sc2002.battle.domain.AbstractStatusEffect;
+import sc2002.battle.domain.Combatant;
+import sc2002.battle.domain.BattleContext;
 public final class AttackBuffEffect extends AbstractStatusEffect {
     private final int attackBonus;
 

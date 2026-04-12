@@ -2,6 +2,10 @@ package com.sc2002.battle.domain;
 
 import java.util.List;
 import java.util.Objects;
+import sc2002.battle.domain.StatusEffectManager;
+import sc2002.battle.domain.BattleContext;
+import sc2002.battle.domain.StatusEffect;
+import sc2002.battle.domain.StunEffect;
 
 public abstract class Combatant {
     private final String name;
@@ -12,6 +16,7 @@ public abstract class Combatant {
     private final StatusEffectManager statusEffectManager;
     private int currentHp;
     private int specialSkillCooldown;
+    private boolean stunned;
 
     protected Combatant(String name, int maxHp, int baseAttack, int baseDefense, int speed) {
         this.name = Objects.requireNonNull(name, "name cannot be null");
@@ -30,7 +35,9 @@ public abstract class Combatant {
         this.statusEffectManager = new StatusEffectManager();
         this.specialSkillCooldown = 0;
     }
-
+    public void addEffect(StatusEffect effect) {
+        statusEffectManager.addEffect(effect, this, null);  // Using the statusEffectManager to add the effect
+    }
     public String getName() {
         return name;
     }
@@ -122,6 +129,24 @@ public abstract class Combatant {
 
     public void removeExpiredEffects() {
         statusEffectManager.removeExpiredEffects();
+    }
+    public void setStunned(boolean stunned) {
+        this.stunned = stunned;
+    }
+    public void tickEffects() {
+        // Iterate through active effects and update each one's state
+        for (StatusEffect effect : statusEffectManager.getActiveEffects()) {
+            if (!effect.isExpired()) {
+                // Call the onTurnEnd method for each effect to reduce its remaining turns
+                effect.onTurnEnd(this, null);  // You might want to pass BattleContext instead of null
+            }
+        }
+    }
+
+    public boolean isStunned() {
+        // You can remove or replace this method if stun is handled via effects
+        return statusEffectManager.getActiveEffects().stream()
+                .anyMatch(effect -> effect instanceof StunEffect && !effect.isExpired());
     }
 
     private void tickSpecialSkillCooldown() {

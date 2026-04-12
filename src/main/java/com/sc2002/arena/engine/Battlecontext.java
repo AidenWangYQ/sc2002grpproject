@@ -3,7 +3,11 @@ package com.sc2002.arena.engine;
 import com.sc2002.arena.model.combatant.Combatant;
 import com.sc2002.arena.model.combatant.Enemy;
 import com.sc2002.arena.model.combatant.Player;
+import sc2002.battle.domain.Combatant;
+import sc2002.battle.domain.Player;
+import sc2002.battle.domain.Enemy;
  
+
 import java.util.ArrayList;
 import java.util.List;
  
@@ -20,7 +24,6 @@ import java.util.List;
 public class BattleContext {
  
     private final Player player;
- 
     // All enemies ever spawned this level (for end-of-game stats)
     private final List<Enemy> allEnemies = new ArrayList<>();
  

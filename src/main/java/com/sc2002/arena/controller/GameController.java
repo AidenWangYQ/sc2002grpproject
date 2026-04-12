@@ -1,53 +1,76 @@
 package com.sc2002.arena.controller;
-
-import com.sc2002.arena.engine.*;
-import com.sc2002.arena.level.Level;
-import com.sc2002.arena.level.LevelFactory;
-import com.sc2002.arena.level.SpawnManager;
-import com.sc2002.arena.model.combatant.Player;
-import com.sc2002.arena.model.combatant.Warrior;
-import com.sc2002.arena.model.combatant.Wizard;
-import com.sc2002.arena.model.item.Item;
-import com.sc2002.arena.model.item.ItemFactory;
-import com.sc2002.arena.strategy.SpeedBasedTurnOrderStrategy;
-import com.sc2002.arena.ui.BattleUI;
-import com.sc2002.arena.ui.ConsoleBattleUI;
- 
+import com.sc2002.arena.BattleUI.*;  // Corrected import
+import com.sc2002.arena.combatant.*;  
+import com.sc2002.arena.engine.*;  
+import com.sc2002.arena.level.*;  
+import java.util.*;  
+import java.util.List;
 import java.util.Scanner;
- 
+import java.util.ArrayList;
+
 public class GameController {
- 
     private final Scanner scanner;
-    private final BattleUI ui;
- 
+    public final ConsoleBattleUI ui;  // Changed from BattleUI to ConsoleBattleUI
+
     public GameController() {
         this.scanner = new Scanner(System.in);
-        this.ui      = new ConsoleBattleUI(scanner);
+        this.ui = new ConsoleBattleUI(scanner);  // This remains valid
     }
- 
-    /**
-     * Run the full game session, including loading screen and post-battle
-     * replay prompt.
-     */
+
     public void run() {
         boolean playing = true;
         while (playing) {
             printLoadingScreen();
- 
-            Player  player = promptPlayerChoice();
-            promptItemSelection(player);
-            Level   level  = promptDifficultyChoice();
- 
-            BattleEngine engine = buildEngine(player, level);
-            engine.startBattle();
- 
+
+            // Initialize player and enemies
+            Player player = promptPlayerChoice();
+            Level level = promptDifficultyChoice();
+
+            // Use buildEngine to create the BattleEngine
+            BattleEngine battleEngine = buildEngine(player, level);
+
+            // Start the battle
+            battleEngine.startBattle();
+
+            // Ask the player if they want to replay
             playing = promptReplay();
         }
- 
         System.out.println("Thanks for playing! Goodbye.");
         scanner.close();
     }
- 
+
+    // Place buildEngine() method here
+
+    private BattleEngine buildEngine(Player player, Level level) {
+        // Create the BattleContext using just the Player
+        BattleContext context = new BattleContext(player);
+
+        // Add enemies to the BattleContext
+        List<Enemy> initialEnemies = level.getInitialWave().getEnemies();
+        for (Enemy enemy : initialEnemies) {
+            context.addInitialEnemy(enemy);  // Add enemies to the context
+        }
+
+        // Create the rest of the necessary components
+        TurnManager turnManager = new TurnManager(new SpeedBasedTurnOrderStrategy());
+        CooldownManager cooldownManager = new CooldownManager();
+        EffectManager effectManager = new EffectManager();
+        ActionResolver actionResolver = new ActionResolver(cooldownManager, ui);
+        SpawnManager spawnManager = new SpawnManager(level, ui);
+
+        // Return a new BattleEngine instance
+        return new BattleEngine(
+                context,          // Pass the BattleContext with player and enemies
+                turnManager,
+                actionResolver,
+                effectManager,
+                cooldownManager,
+                spawnManager,
+                ui);
+    }
+
+    // Other methods like printLoadingScreen(), promptPlayerChoice(), etc.
+
     private void printLoadingScreen() {
         System.out.println();
         System.out.println("╔══════════════════════════════════════════════════╗");
@@ -75,62 +98,76 @@ public class GameController {
         System.out.println("  3) Hard   – 2 Goblins         | Backup: 1 Goblin + 2 Wolves");
         System.out.println();
     }
- 
+
     private Player promptPlayerChoice() {
         System.out.println("  Choose your class (1 = Warrior, 2 = Wizard):");
         int choice = readIntInRange(1, 2);
-        Player player = (choice == 1) ? new Warrior() : new Wizard();
-        System.out.printf("  → %s selected.%n%n", player.getName());
+        Inventory inventory=promptItemSelection();
+        Player player = (choice == 1) ? new Warrior(inventory) : new Wizard(inventory);
+        System.out.printf(" → %s selected.%n%n", player.getName());
         return player;
     }
- 
-    private void promptItemSelection(Player player) {
-        String[] itemNames = { "Potion", "Power Stone", "Smoke Bomb" };
- 
-        System.out.println("  Choose your first item:");
-        printItemMenu(itemNames);
-        Item first = ItemFactory.create(itemNames[readIntInRange(1, 3) - 1]);
-        player.addItem(first);
- 
-        System.out.println("  Choose your second item (duplicates allowed):");
-        printItemMenu(itemNames);
-        Item second = ItemFactory.create(itemNames[readIntInRange(1, 3) - 1]);
-        player.addItem(second);
- 
-        System.out.printf("  → Items: %s + %s%n%n",
-                first.getName(), second.getName());
-    }
- 
-    private void printItemMenu(String[] names) {
-        for (int i = 0; i < names.length; i++) {
-            System.out.printf("    %d) %s%n", i + 1, names[i]);
+
+    private Inventory promptItemSelection() {
+    String[] itemNames = { "Potion", "Power Stone", "Smoke Bomb" };
+    List<Item> startingItems = new ArrayList<>();
+
+    // Prompt the player for their first item choice
+    System.out.println("  Choose your first item:");
+    printItemMenu(itemNames);
+    Item firstItem = createItem(itemNames[readIntInRange(1, 3) - 1]);
+    startingItems.add(firstItem);  // Add the first selected item
+
+    // Prompt the player for their second item choice
+    System.out.println("  Choose your second item (duplicates allowed):");
+    printItemMenu(itemNames);
+    Item secondItem = createItem(itemNames[readIntInRange(1, 3) - 1]);
+    startingItems.add(secondItem);  // Add the second selected item
+
+    return new Inventory(startingItems);  // Pass the list of 2 items to the Inventory constructor
+}
+
+    // Helper method to create Item based on player selection using switch
+    private Item createItem(String itemName) {
+        switch (itemName) {
+            case "Potion":
+                return new Potion();  // Return a new Potion object
+            case "Power Stone":
+                return new PowerStone();  // Return a new Power Stone object
+            case "Smoke Bomb":
+                return new SmokeBomb();  // Return a new Smoke Bomb object
+            default:
+                throw new IllegalArgumentException("Unknown item: " + itemName);  // Handle invalid input
         }
     }
- 
-    private Level promptDifficultyChoice() {
-        System.out.println("  Choose difficulty (1 = Easy, 2 = Medium, 3 = Hard):");
-        int choice = readIntInRange(1, 3);
-        Level level = LevelFactory.create(choice);
-        System.out.printf("  → %s selected.%n%n", level);
-        return level;
+
+    // Helper method to print the player's current inventory
+    private void printInventory(Inventory inventory) {
+        List<Inventory.InventorySlot> slots = inventory.getSlots();
+        if (slots.isEmpty()) {
+            System.out.println("  No items in inventory.");
+        } else {
+            System.out.println("  Inventory:");
+            int index = 1;
+            for (Inventory.InventorySlot slot : slots) {
+                String status = slot.isUsable() ? "Usable" : "Consumed";
+                System.out.printf("  %d) %s - %s%n", index++, slot.getItem().getName(), status);  // Display items with their status
+            }
+        }
     }
 
-    private BattleEngine buildEngine(Player player, Level level) {
-        BattleContext   context         = new BattleContext(player);
-        TurnManager     turnManager     = new TurnManager(new SpeedBasedTurnOrderStrategy());
-        CooldownManager cooldownManager = new CooldownManager();
-        EffectManager   effectManager   = new EffectManager();
-        ActionResolver  actionResolver  = new ActionResolver(cooldownManager, ui);
-        SpawnManager    spawnManager    = new SpawnManager(level, ui);
- 
-        return new BattleEngine(
-                context,
-                turnManager,
-                actionResolver,
-                effectManager,
-                cooldownManager,
-                spawnManager,
-                ui);
+    private void printItemMenu(String[] names) {
+        for (int i = 0; i < names.length; i++) {
+            System.out.printf("%d) %s%n", i + 1, names[i]);
+        }
+    }
+
+    private Level promptDifficultyChoice() {
+        System.out.println(" Choose difficulty (1 = Easy, 2 = Medium, 3 = Hard):");
+        int choice = readIntInRange(1, 3);
+        Level level = LevelFactory.create(choice);
+        System.out.printf(" → %s selected.%n%n", level);
+        return level;
     }
 
     private boolean promptReplay() {
@@ -142,9 +179,11 @@ public class GameController {
     }
 
     private int readIntInRange(int min, int max) {
+    Scanner scanner=new Scanner(System.in);
         while (true) {
             System.out.printf("  Enter choice (%d–%d): ", min, max);
             try {
+
                 int val = Integer.parseInt(scanner.nextLine().trim());
                 if (val >= min && val <= max) return val;
                 System.out.printf("  Please enter a number between %d and %d.%n", min, max);
@@ -154,4 +193,3 @@ public class GameController {
         }
     }
 }
- 

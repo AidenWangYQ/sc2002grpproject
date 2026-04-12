@@ -1,7 +1,7 @@
 package com.sc2002.arena.engine;
 
 import com.sc2002.arena.model.combatant.Player;
- 
+import sc2002.battle.domain.Combatant;
 /**
  * Manages special-skill cooldown ticking for player combatants.
  *
@@ -14,6 +14,10 @@ import com.sc2002.arena.model.combatant.Player;
  */
 
 public class CooldownManager {
+
+     public void startCooldown(Player player) {
+        player.setSkillCooldown(Player.SKILL_COOLDOWN);  // Set the cooldown to the static value
+    }
 
     public void tickCooldown(Player player) {
         player.tickCooldown();

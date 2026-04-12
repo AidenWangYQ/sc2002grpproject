@@ -6,7 +6,19 @@ import com.sc2002.arena.model.combatant.Enemy;
 import com.sc2002.arena.model.combatant.Player;
 import com.sc2002.arena.model.item.Item;
 import com.sc2002.arena.ui.BattleUI;
- 
+import com.sc2002.arena.engine.TurnManager;
+import com.sc2002.arena.engine.ActionResolver;
+import com.sc2002.arena.engine.EffectManager;
+import com.sc2002.arena.engine.CooldownManager;
+import com.sc2002.arena.level.SpawnManager;
+import sc2002.battle.domain.ActionType;
+import sc2002.battle.domain.Combatant;
+import sc2002.battle.domain.Enemy;
+import sc2002.battle.domain.Player;
+import sc2002.battle.domain.Item;
+import com.sc2002.arena.ui.BattleUI;
+import com.sc2002.arena.engine.BattleContext;
+
 import java.util.List;
 import java.util.stream.Collectors;
 /*
@@ -25,7 +37,7 @@ import java.util.stream.Collectors;
  *      h. Check backup spawn trigger
  *   5. Print round summary
  */
-public class Battleengine {
+public class BattleEngine {
     private final BattleContext    context;
     private final TurnManager      turnManager;
     private final ActionResolver   actionResolver;

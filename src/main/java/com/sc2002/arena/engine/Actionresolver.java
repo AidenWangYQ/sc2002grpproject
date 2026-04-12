@@ -1,5 +1,17 @@
 package com.sc2002.arena.engine;
-
+import sc2002.battle.domain.ActionType;
+import sc2002.battle.domain.Combatant;
+import sc2002.battle.domain.Enemy;
+import sc2002.battle.domain.Player;
+import sc2002.battle.domain.DefendEffect;
+import sc2002.battle.domain.*;
+import sc2002.battle.domain.ActionType;
+import sc2002.battle.domain.SmokeBomb;
+import sc2002.battle.domain.SmokeBombInvulnerabilityEffect;
+import java.util.List;
+import com.sc2002.arena.engine.*;
+import com.sc2002.arena.ui.BattleUI;
+import com.sc2002.arena.engine.CooldownManager;
 import com.sc2002.arena.model.action.ActionType;
 import com.sc2002.arena.model.combatant.Combatant;
 import com.sc2002.arena.model.combatant.Enemy;
@@ -126,7 +138,10 @@ public class ActionResolver {
         // SkipsCooldown marker interface flags this without instanceof on
         // a concrete class.
         if (selectedItem instanceof SkipsCooldown) {
-            // cooldown unchanged — do nothing
+            ui.printMessage(selectedItem.getName() + " skipped cooldown.");
+        } else {
+            // Apply cooldown logic for other items
+            cooldownManager.startCooldown(player);  // Start cooldown for regular items
         }
     }
  

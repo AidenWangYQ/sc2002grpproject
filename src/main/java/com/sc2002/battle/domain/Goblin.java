@@ -1,5 +1,6 @@
 package com.sc2002.battle.domain;
-
+import sc2002.battle.domain.Enemy;
+import sc2002.battle.domain.BasicAttackEnemyActionStrategy;
 public final class Goblin extends Enemy {
     public Goblin() {
         this("Goblin");

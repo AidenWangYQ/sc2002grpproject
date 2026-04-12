@@ -1,5 +1,11 @@
 package com.sc2002.battle.domain;
-
+import sc2002.battle.domain.SpecialSkill;
+import sc2002.battle.domain.ActionResult;
+import sc2002.battle.domain.ActionContext;
+import sc2002.battle.domain.SkillUseMode;
+import sc2002.battle.domain.Combatant;
+import sc2002.battle.domain.BattleContext;
+import sc2002.battle.domain.AttackBuffEffect;
 import java.util.List;
 
 public final class ArcaneBlastSkill implements SpecialSkill {

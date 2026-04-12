@@ -1,4 +1,6 @@
-package com.sc2002.battle.domain;
+package sc2002.battle.domain;
+import sc2002.battle.domain.Combatant;
+import sc2002.battle.domain.BattleContext;
 
 import java.util.Objects;
 

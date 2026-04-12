@@ -5,7 +5,10 @@ public final class PowerStone implements Item {
     public String getName() {
         return "Power Stone";
     }
-
+    private boolean used;
+    public PowerStone() {
+        this.used = false;
+    }
     @Override
     public ActionResult use(ActionContext context) {
         Combatant actor = context.getActor();
@@ -18,5 +21,16 @@ public final class PowerStone implements Item {
         result.merge(skillResult);
         result.recordNote("Power Stone does not change cooldown.");
         return result;
+    }
+    public boolean isUsed() {
+        return used;  // Returns whether the power stone has been used
+    }
+
+    @Override
+    public void use() {
+        if (!used) {
+            used = true;  // Mark as used when used
+            // Apply power stone effects (e.g., free special skill use)
+        }
     }
 }

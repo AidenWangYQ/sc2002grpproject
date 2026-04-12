@@ -2,6 +2,8 @@ package com.sc2002.arena.level;
 
 import com.sc2002.arena.model.combatant.Enemy;
 import java.util.List;
+import sc2002.battle.domain.Enemy;
+import java.util.List;
  
 /**
  * Represents one wave of enemies (initial or backup).

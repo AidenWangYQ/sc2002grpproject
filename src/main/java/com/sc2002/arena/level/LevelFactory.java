@@ -2,7 +2,10 @@ package com.sc2002.arena.level;
 
 import com.sc2002.arena.model.combatant.Goblin;
 import com.sc2002.arena.model.combatant.Wolf;
- 
+import sc2002.battle.domain.Goblin;
+import sc2002.battle.domain.Wolf;
+import com.sc2002.arena.level.Level;
+import com.sc2002.arena.level.Wave;
 import java.util.List;
  
 /**

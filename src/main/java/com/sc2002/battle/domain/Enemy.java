@@ -1,7 +1,10 @@
 package com.sc2002.battle.domain;
 
 import java.util.Objects;
-
+import sc2002.battle.domain.Combatant;
+import sc2002.battle.domain.CombatAction;
+import sc2002.battle.domain.EnemyActionStrategy;
+import sc2002.battle.domain.BattleContext;
 public abstract class Enemy extends Combatant {
     private final EnemyActionStrategy actionStrategy;
 
