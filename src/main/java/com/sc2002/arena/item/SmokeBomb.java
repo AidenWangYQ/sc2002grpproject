@@ -1,0 +1,21 @@
+package com.sc2002.arena.item;
+
+import com.sc2002.arena.action.*;
+import com.sc2002.arena.combatant.*;
+import com.sc2002.arena.effect.*;
+
+public final class SmokeBomb implements Item {
+    @Override
+    public String getName() {
+        return "Smoke Bomb";
+    }
+
+    @Override
+    public ActionResult use(ActionContext context) {
+        Combatant actor = context.getActor();
+        ActionResult result = ActionResult.forAction(actor, "Item");
+        actor.applyEffect(new SmokeBombInvulnerabilityEffect(), context.getBattleContext());
+        result.recordEffect(actor, "Smoke Bomb Invulnerability");
+        return result;
+    }
+}
