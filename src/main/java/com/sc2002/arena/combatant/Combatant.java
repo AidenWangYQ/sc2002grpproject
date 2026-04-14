@@ -1,37 +1,140 @@
 package com.sc2002.arena.combatant;
 
-import java.util.List;
+import java.util.*;
+import com.sc2002.arena.effect.*;
+import com.sc2002.arena.strategy.BattleContext;
 
-import com.sc2002.arena.action.Action;
-import com.sc2002.arena.effect.StatusEffect;
-import com.sc2002.arena.skill.Skill;
 
-public interface Combatant {
-    String getName();
+public abstract class Combatant {
+    private final String name;
+    private final int maxHp;
+    private final int baseAttack;
+    private final int baseDefense;
+    private final int speed;
+    private final StatusEffectManager statusEffectManager;
+    private int currentHp;
+    private int specialSkillCooldown;
 
-    int getMaxHp();
-    int getCurrentHp();
-    int getAttack();
-    int getDefense();
-    int getSpeed();
+    protected Combatant(String name, int maxHp, int baseAttack, int baseDefense, int speed) {
+        this.name = Objects.requireNonNull(name, "name cannot be null");
+        validateNonNegative(maxHp, "maxHp");
+        validateNonNegative(baseAttack, "baseAttack");
+        validateNonNegative(baseDefense, "baseDefense");
+        validateNonNegative(speed, "speed");
+        if (maxHp == 0) {
+            throw new IllegalArgumentException("maxHp must be greater than 0.");
+        }
+        this.maxHp = maxHp;
+        this.baseAttack = baseAttack;
+        this.baseDefense = baseDefense;
+        this.speed = speed;
+        this.currentHp = maxHp;
+        this.statusEffectManager = new StatusEffectManager();
+        this.specialSkillCooldown = 0;
+    }
 
-    boolean isAlive();
+    public String getName() {
+        return name;
+    }
 
-    void receiveDamage(int amount);
-    void heal(int amount);
+    public int getMaxHp() {
+        return maxHp;
+    }
 
-    void addStatusEffect(StatusEffect effect);
-    void removeExpiredEffects();
-    List<StatusEffect> getStatusEffects();
+    public int getCurrentHp() {
+        return currentHp;
+    }
 
-    boolean hasEffect(Class<? extends StatusEffect> effectType);
+    public int getBaseAttack() {
+        return baseAttack;
+    }
 
-    List<Action> getAvailableActions();
-    Skill getSpecialSkill();
+    public int getBaseDefense() {
+        return baseDefense;
+    }
 
-    int getSpecialCooldownRemaining();
-    void setSpecialCooldownRemaining(int turns);
-    void decrementSpecialCooldownIfNeeded();
+    public int getSpeed() {
+        return speed;
+    }
 
-    boolean canAct();
+    public int getSpecialSkillCooldown() {
+        return specialSkillCooldown;
+    }
+
+    public void setSpecialSkillCooldown(int specialSkillCooldown) {
+        validateNonNegative(specialSkillCooldown, "specialSkillCooldown");
+        this.specialSkillCooldown = specialSkillCooldown;
+    }
+
+    public int getEffectiveAttack(BattleContext context) {
+        return statusEffectManager.modifyAttack(this, baseAttack, context);
+    }
+
+    public int getEffectiveDefense(BattleContext context) {
+        return statusEffectManager.modifyDefense(this, baseDefense, context);
+    }
+
+    public boolean isAlive() {
+        return currentHp > 0;
+    }
+
+    public boolean canAct() {
+        return isAlive() && !statusEffectManager.preventsAction();
+    }
+
+    public int heal(int amount) {
+        validateNonNegative(amount, "amount");
+        int previousHp = currentHp;
+        currentHp = Math.min(maxHp, currentHp + amount);
+        return currentHp - previousHp;
+    }
+
+    public int receiveDamage(int rawDamage, Combatant attacker, BattleContext context) {
+        validateNonNegative(rawDamage, "rawDamage");
+        int adjustedDamage = statusEffectManager.modifyIncomingDamage(this, attacker, rawDamage, context);
+        int previousHp = currentHp;
+        currentHp = Math.max(0, currentHp - adjustedDamage);
+        return previousHp - currentHp;
+    }
+
+    public void applyEffect(StatusEffect effect, BattleContext context) {
+        statusEffectManager.addEffect(effect, this, context);
+    }
+
+    public List<StatusEffect> getActiveEffects() {
+        return statusEffectManager.getActiveEffects();
+    }
+
+    public void clearStatusEffects() {
+        statusEffectManager.clear();
+    }
+
+    public void onTurnStart(BattleContext context) {
+        statusEffectManager.onTurnStart(this, context);
+    }
+
+    public void onTurnEnd(BattleContext context) {
+        statusEffectManager.onTurnEnd(this, context);
+        tickSpecialSkillCooldown();
+    }
+
+    public void onRoundEnd(BattleContext context) {
+        statusEffectManager.onRoundEnd(this, context);
+    }
+
+    public void removeExpiredEffects() {
+        statusEffectManager.removeExpiredEffects();
+    }
+
+    private void tickSpecialSkillCooldown() {
+        if (specialSkillCooldown > 0) {
+            specialSkillCooldown--;
+        }
+    }
+
+    private void validateNonNegative(int value, String fieldName) {
+        if (value < 0) {
+            throw new IllegalArgumentException(fieldName + " cannot be negative.");
+        }
+    }
 }

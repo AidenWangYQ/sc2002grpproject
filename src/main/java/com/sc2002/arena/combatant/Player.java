@@ -1,172 +1,49 @@
 package com.sc2002.arena.combatant;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import com.sc2002.arena.action.*;
+import com.sc2002.arena.item.*;
+import com.sc2002.arena.skill.*;
 
-import com.sc2002.arena.action.Action;
-import com.sc2002.arena.effect.StatusEffect;
-import com.sc2002.arena.item.Inventory;
-import com.sc2002.arena.skill.Skill;
-
-public abstract class Player implements Combatant {
-    private final String name;
-    private final int maxHp;
-    private int currentHp;
-    private int attack;
-    private int defense;
-    private final int speed;
-
-    private final List<StatusEffect> statusEffects;
-    private final List<Action> availableActions;
-
+public abstract class Player extends Combatant {
     private final Inventory inventory;
-    private final Skill specialSkill;
-
-    private int specialCooldownRemaining;
+    private final SpecialSkill specialSkill;
 
     protected Player(
             String name,
             int maxHp,
-            int attack,
-            int defense,
+            int baseAttack,
+            int baseDefense,
             int speed,
             Inventory inventory,
-            Skill specialSkill,
-            List<Action> availableActions
+            SpecialSkill specialSkill
     ) {
-        this.name = name;
-        this.maxHp = maxHp;
-        this.currentHp = maxHp;
-        this.attack = attack;
-        this.defense = defense;
-        this.speed = speed;
-        this.inventory = inventory;
-        this.specialSkill = specialSkill;
-        this.availableActions = new ArrayList<>(availableActions);
-        this.statusEffects = new ArrayList<>();
-        this.specialCooldownRemaining = 0;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public int getMaxHp() {
-        return maxHp;
-    }
-
-    @Override
-    public int getCurrentHp() {
-        return currentHp;
-    }
-
-    @Override
-    public int getAttack() {
-        return attack;
-    }
-
-    protected void setAttack(int attack) {
-        this.attack = attack;
-    }
-
-    @Override
-    public int getDefense() {
-        return defense;
-    }
-
-    protected void setDefense(int defense) {
-        this.defense = defense;
-    }
-
-    @Override
-    public int getSpeed() {
-        return speed;
-    }
-
-    @Override
-    public boolean isAlive() {
-        return currentHp > 0;
-    }
-
-    @Override
-    public void receiveDamage(int amount) {
-        currentHp = Math.max(0, currentHp - Math.max(0, amount));
-    }
-
-    @Override
-    public void heal(int amount) {
-        currentHp = Math.min(maxHp, currentHp + Math.max(0, amount));
-    }
-
-    @Override
-    public void addStatusEffect(StatusEffect effect) {
-        if (effect != null) {
-            statusEffects.add(effect);
-        }
-    }
-
-    @Override
-    public void removeExpiredEffects() {
-        Iterator<StatusEffect> iterator = statusEffects.iterator();
-        while (iterator.hasNext()) {
-            StatusEffect effect = iterator.next();
-            if (effect.isExpired()) {
-                iterator.remove();
-            }
-        }
-    }
-
-    @Override
-    public List<StatusEffect> getStatusEffects() {
-        return List.copyOf(statusEffects);
-    }
-
-    @Override
-    public boolean hasEffect(Class<? extends StatusEffect> effectType) {
-        for (StatusEffect effect : statusEffects) {
-            if (effectType.isInstance(effect) && !effect.isExpired()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public List<Action> getAvailableActions() {
-        return List.copyOf(availableActions);
-    }
-
-    @Override
-    public Skill getSpecialSkill() {
-        return specialSkill;
+        super(name, maxHp, baseAttack, baseDefense, speed);
+        this.inventory = Objects.requireNonNull(inventory, "inventory cannot be null");
+        this.specialSkill = Objects.requireNonNull(specialSkill, "specialSkill cannot be null");
     }
 
     public Inventory getInventory() {
         return inventory;
     }
 
-    @Override
-    public int getSpecialCooldownRemaining() {
-        return specialCooldownRemaining;
+    public SpecialSkill getSpecialSkill() {
+        return specialSkill;
     }
 
-    @Override
-    public void setSpecialCooldownRemaining(int turns) {
-        this.specialCooldownRemaining = Math.max(0, turns);
-    }
-
-    @Override
-    public void decrementSpecialCooldownIfNeeded() {
-        if (specialCooldownRemaining > 0) {
-            specialCooldownRemaining--;
+    public List<CombatAction> getAvailableActions() {
+        if (!isAlive()) {
+            return List.of();
         }
-    }
-
-    @Override
-    public boolean canAct() {
-        return isAlive();
+        List<CombatAction> actions = new ArrayList<>();
+        actions.add(new BasicAttackAction());
+        actions.add(new DefendAction());
+        if (inventory.hasUsableItems()) {
+            actions.add(new UseItemAction());
+        }
+        if (getSpecialSkillCooldown() == 0) {
+            actions.add(new UseSpecialSkillAction());
+        }
+        return List.copyOf(actions);
     }
 }
