@@ -1,0 +1,124 @@
+package com.sc2002.arena.BattleUI;  // Change from com.sc2002.arena.ui
+// Rest of the file remains the same...
+
+// Replace all com.sc2002.arena.battle.domain.* imports with these:
+import com.sc2002.arena.combatant.Combatant;
+import com.sc2002.arena.combatant.Player;
+import com.sc2002.arena.combatant.Enemy;
+import com.sc2002.arena.combatant.Item;
+import com.sc2002.arena.combatant.ActionType;
+import com.sc2002.arena.engine.BattleContext;  // or wherever BattleContext actually lives
+
+import java.util.List;
+import java.util.Scanner;
+
+public class ConsoleBattleUI implements BattleUI {
+    private final Scanner scanner;
+
+    public ConsoleBattleUI(Scanner scanner) {
+        this.scanner = scanner;
+    }
+
+    @Override
+    public void printMessage(String message) {
+        System.out.println(message);
+    }
+
+    @Override
+    public void printEliminated(Combatant target) {
+        System.out.println(target.getName() + " has been eliminated!");
+    }
+
+    @Override
+    public void printRoundHeader(int roundNumber) {
+        System.out.println("--- Round " + roundNumber + " ---");
+    }
+
+    @Override
+    public void printRoundSummary(BattleContext context) {
+        System.out.println("Enemies remaining: " + context.getEnemies().size());
+    }
+
+    @Override
+    public void printAttack(Combatant attacker, Combatant target, int damage) {
+        System.out.println(attacker.getName() + " attacks " + target.getName() + " for " + damage + " damage.");
+    }
+
+    @Override
+    public void printDefend(Player player) {
+        System.out.println(player.getName() + " defends, reducing incoming damage.");
+    }
+
+    @Override
+    public void printVictoryScreen(BattleContext context) {
+        System.out.println("Victory! You have defeated all enemies.");
+    }
+
+    @Override
+    public void printDefeatScreen(BattleContext context) {
+        System.out.println("Defeat! You have been defeated.");
+    }
+
+    @Override
+    public ActionType promptActionChoice(Player player, List<Enemy> enemies) {
+        System.out.println("Choose action: 1. Attack 2. Defend 3. Use Item 4. Special Skill");
+        int choice = scanner.nextInt();
+        switch (choice) {
+            case 1: return ActionType.ATTACK;
+            case 2: return ActionType.DEFEND;
+            case 3: return ActionType.USE_ITEM;
+            case 4: return ActionType.SPECIAL_SKILL;
+            default: return ActionType.ATTACK;  // Default
+        }
+    }
+
+    @Override
+    public Item promptItemSelection(List<Item> usableItems) {
+        System.out.println("Choose item:");
+        for (int i = 0; i < usableItems.size(); i++) {
+            System.out.println((i + 1) + ". " + usableItems.get(i).getName());
+        }
+        int choice = scanner.nextInt();
+        return usableItems.get(choice - 1);
+    }
+
+    @Override
+    public Enemy promptTargetSelection(List<Enemy> enemies) {
+        System.out.println("Choose target:");
+        for (int i = 0; i < enemies.size(); i++) {
+            System.out.println((i + 1) + ". " + enemies.get(i).getName());
+        }
+        int choice = scanner.nextInt();
+        return enemies.get(choice - 1);
+    }
+
+    @Override
+    public void printCooldownStatus(Player player) {
+        System.out.println("Special skill cooldown: " + player.getCooldown());
+    }
+
+    @Override
+    public void printEffectSummary(Combatant combatant) {
+        System.out.println("Active effects on " + combatant.getName() + ": " + combatant.getEffects());
+    }
+
+    @Override
+    public void printSmokeBombBlock(Enemy enemy, Player player) {
+        System.out.println("Smoke Bomb blocks " + enemy.getName() + "'s attack on " + player.getName());
+    }
+
+    @Override
+    public void printTurnHeader(Combatant combatant) {
+        System.out.println(combatant.getName() + "'s turn.");
+    }
+
+    @Override
+    public void printStunSkip(Combatant combatant) {
+        System.out.println(combatant.getName() + " is stunned and skips turn.");
+    }
+
+    @Override
+    public void printBackupSpawn(List<Enemy> backup) {
+        System.out.println("Backup enemies spawned: " + backup.size());
+    }
+}

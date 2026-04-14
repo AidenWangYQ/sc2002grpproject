@@ -1,24 +1,12 @@
 package com.sc2002.arena.engine;
-import com.sc2002.arena.level.SpawnManager;
-import com.sc2002.arena.model.action.ActionType;
-import com.sc2002.arena.model.combatant.Combatant;
-import com.sc2002.arena.model.combatant.Enemy;
-import com.sc2002.arena.model.combatant.Player;
-import com.sc2002.arena.model.item.Item;
-import com.sc2002.arena.ui.BattleUI;
-import com.sc2002.arena.engine.TurnManager;
-import com.sc2002.arena.engine.ActionResolver;
-import com.sc2002.arena.engine.EffectManager;
-import com.sc2002.arena.engine.CooldownManager;
-import com.sc2002.arena.level.SpawnManager;
-import sc2002.battle.domain.ActionType;
-import sc2002.battle.domain.Combatant;
-import sc2002.battle.domain.Enemy;
-import sc2002.battle.domain.Player;
-import sc2002.battle.domain.Item;
-import com.sc2002.arena.ui.BattleUI;
-import com.sc2002.arena.engine.BattleContext;
 
+import com.sc2002.arena.combatant.Combatant;
+import com.sc2002.arena.combatant.Player;
+import com.sc2002.arena.combatant.Enemy;
+import com.sc2002.arena.item.Item;
+import com.sc2002.arena.BattleUI.BattleUI;
+import com.sc2002.arena.level.SpawnManager;
+import com.sc2002.arena.action.CombatAction;
 import java.util.List;
 import java.util.stream.Collectors;
 /*
@@ -37,7 +25,7 @@ import java.util.stream.Collectors;
  *      h. Check backup spawn trigger
  *   5. Print round summary
  */
-public class BattleEngine {
+public class Battleengine {
     private final BattleContext    context;
     private final TurnManager      turnManager;
     private final ActionResolver   actionResolver;
@@ -46,7 +34,7 @@ public class BattleEngine {
     private final SpawnManager     spawnManager;
     private final BattleUI         ui;
  
-    public BattleEngine(
+    public Battleengine(
             BattleContext   context,
             TurnManager     turnManager,
             ActionResolver  actionResolver,

@@ -1,15 +1,11 @@
 package com.sc2002.arena.engine;
 
-import com.sc2002.arena.model.combatant.Combatant;
-import com.sc2002.arena.model.combatant.Enemy;
-import com.sc2002.arena.model.combatant.Player;
-import sc2002.battle.domain.Combatant;
-import sc2002.battle.domain.Player;
-import sc2002.battle.domain.Enemy;
- 
-
+import com.sc2002.arena.combatant.Combatant;
+import com.sc2002.arena.combatant.Enemy;
+import com.sc2002.arena.combatant.Player;
 import java.util.ArrayList;
 import java.util.List;
+
  
 /**
  * Immutable-ish snapshot of the current battle state.

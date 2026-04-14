@@ -1,19 +1,21 @@
-package com.sc2002.arena.ui;
-import sc2002.battle.domain.Combatant;
-import sc2002.battle.domain.Player;
-import sc2002.battle.domain.BattleContext;
-import sc2002.battle.domain.Item;
-import sc2002.battle.domain.StatusEffect;
-import sc2002.battle.domain.Enemy;
-import sc2002.battle.domain.ActionType;
-import com.sc2002.arena.ui.BattleUI;
+package com.sc2002.arena.BattleUI;
 
+import com.sc2002.arena.combatant.Combatant;
+import com.sc2002.arena.combatant.Player;
+import com.sc2002.arena.combatant.Enemy;
+import com.sc2002.arena.engine.BattleContext;
+import com.sc2002.arena.item.Item;
+import com.sc2002.arena.effect.StatusEffect;
+import com.sc2002.arena.action.CombatAction;
+import com.sc2002.arena.action.BasicAttackAction;
+import com.sc2002.arena.action.DefendAction;
+import com.sc2002.arena.action.UseSpecialSkillAction;
+import com.sc2002.arena.action.UseItemAction;
 import java.util.List;
 import java.util.Scanner;
 
 public class ConsoleBattleUI implements BattleUI {
     private final Scanner scanner;
-    private Combatant combatant;
 
     public ConsoleBattleUI(Scanner scanner) {
         this.scanner = scanner;
@@ -69,26 +71,20 @@ public class ConsoleBattleUI implements BattleUI {
     }
 
     @Override
-    public ActionType promptActionChoice(Player player, List<Enemy> enemies) {
-        System.out.println("Choose an action for player :");
-        System.out.println("1) Basic Attack");
-        System.out.println("2) Defend");
-        System.out.println("3) Special Skill");
-        System.out.println("4) Use Item");
+    public CombatAction promptActionChoice(Player player, List<Enemy> enemies) {
+    System.out.println("Choose an action for player:");
+    System.out.println("1) Basic Attack");
+    System.out.println("2) Defend");
+    System.out.println("3) Special Skill");
+    System.out.println("4) Use Item");
 
-        // Return ActionType based on user input
-        int choice = readIntInRange(1, 4);
-        switch (choice) {
-            case 1:
-                return ActionType.BASIC_ATTACK;
-            case 2:
-                return ActionType.DEFEND;
-            case 3:
-                return ActionType.SPECIAL_SKILL;
-            case 4:
-                return ActionType.USE_ITEM;
-            default:
-                return ActionType.BASIC_ATTACK; // Default case
+    int choice = readIntInRange(1, 4);
+    switch (choice) {
+        case 1: return new BasicAttackAction();
+        case 2: return new DefendAction();
+        case 3: return new UseSpecialSkillAction();
+        case 4: return new UseItemAction();
+        default: return new BasicAttackAction();
         }
     }
 
@@ -115,27 +111,27 @@ public class ConsoleBattleUI implements BattleUI {
 
     @Override
     public void printCooldownStatus(Player player) {
-        if (player.getSpecialSkillCooldown() == 0) {
+        if (player.getSpecialCooldownRemaining() == 0) {
             System.out.printf("%s's special skill is ready!%n", player.getName());
         } else {
             System.out.printf("%s's special skill cooldown: %d turn(s)%n",
-                    player.getName(), player.getSpecialSkillCooldown());
+                    player.getName(), player.getSpecialCooldownRemaining());
         }
     }
 
     @Override
-    public void printEffectSummary(Combatant combatant) {
-        System.out.print("Active Effects: ");
-        List<StatusEffect> effects = combatant.getActiveEffects();
-        if (effects.isEmpty()) {
-            System.out.println("None.");
-        } else {
-            for (StatusEffect effect : effects) {
-                System.out.printf("%s(%d turns remaining) ", effect.getName(), effect.getRemainingTurns());
-            }
-            System.out.println();
+public void printEffectSummary(Combatant combatant) {
+    System.out.print("Active Effects: ");
+    List<StatusEffect> effects = combatant.getStatusEffects();
+    if (effects.isEmpty()) {
+        System.out.println("None.");
+    } else {
+        for (StatusEffect effect : effects) {
+            System.out.printf("%s ", effect.getName());
         }
+        System.out.println();
     }
+}
 
     @Override
     public void printTurnHeader(Combatant combatant) {
