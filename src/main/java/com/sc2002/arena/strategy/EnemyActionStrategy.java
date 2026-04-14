@@ -1,7 +1,9 @@
 package com.sc2002.arena.strategy;
 
-import com.sc2002.arena.action.*;
-import com.sc2002.arena.combatant.*;
+import com.sc2002.arena.action.CombatAction;
+
+import com.sc2002.arena.combatant.Combatant;
+import com.sc2002.arena.combatant.Enemy;
 
 
 public interface EnemyActionStrategy {

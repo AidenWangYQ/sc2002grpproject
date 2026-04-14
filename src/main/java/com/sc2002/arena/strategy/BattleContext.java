@@ -1,7 +1,8 @@
 package com.sc2002.arena.strategy;
 
-import java.util.*;
-import com.sc2002.arena.combatant.*;
+import java.util.List;
+
+import com.sc2002.arena.combatant.Combatant;
 
 public interface BattleContext {
     List<Combatant> getAliveEnemiesOf(Combatant actor);

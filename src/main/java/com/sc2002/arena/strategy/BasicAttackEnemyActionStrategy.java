@@ -1,8 +1,12 @@
 package com.sc2002.arena.strategy;
 
-import java.util.*;
-import com.sc2002.arena.action.*;
-import com.sc2002.arena.combatant.*;
+import java.util.List;
+
+import com.sc2002.arena.action.BasicAttackAction;
+import com.sc2002.arena.action.CombatAction;
+
+import com.sc2002.arena.combatant.Combatant;
+import com.sc2002.arena.combatant.Enemy;
 
 public final class BasicAttackEnemyActionStrategy implements EnemyActionStrategy {
     @Override

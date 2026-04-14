@@ -1,9 +1,22 @@
 package com.sc2002.arena.combatant;
 
-import java.util.*;
-import com.sc2002.arena.action.*;
-import com.sc2002.arena.item.*;
-import com.sc2002.arena.skill.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+
+import com.sc2002.arena.action.BasicAttackAction;
+import com.sc2002.arena.action.CombatAction;
+import com.sc2002.arena.action.DefendAction;
+import com.sc2002.arena.action.UseItemAction;
+import com.sc2002.arena.action.UseSpecialSkillAction;
+
+import com.sc2002.arena.combatant.Player;
+
+import com.sc2002.arena.skill.SpecialSkill;
+
+import com.sc2002.arena.item.Inventory;
+
 
 public abstract class Player extends Combatant {
     private final Inventory inventory;
@@ -16,8 +29,7 @@ public abstract class Player extends Combatant {
             int baseDefense,
             int speed,
             Inventory inventory,
-            SpecialSkill specialSkill
-    ) {
+            SpecialSkill specialSkill) {
         super(name, maxHp, baseAttack, baseDefense, speed);
         this.inventory = Objects.requireNonNull(inventory, "inventory cannot be null");
         this.specialSkill = Objects.requireNonNull(specialSkill, "specialSkill cannot be null");

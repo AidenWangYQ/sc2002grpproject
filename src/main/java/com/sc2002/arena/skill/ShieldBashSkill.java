@@ -1,8 +1,12 @@
 package com.sc2002.arena.skill;
 
-import com.sc2002.arena.action.*;
-import com.sc2002.arena.combatant.*;
-import com.sc2002.arena.effect.*;
+import com.sc2002.arena.action.ActionContext;
+import com.sc2002.arena.action.ActionResult;
+
+import com.sc2002.arena.combatant.Combatant;
+
+import com.sc2002.arena.effect.StunEffect;
+
 import com.sc2002.arena.strategy.BattleContext;
 
 public final class ShieldBashSkill implements SpecialSkill {

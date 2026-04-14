@@ -1,8 +1,12 @@
 package com.sc2002.arena.item;
 
-import com.sc2002.arena.action.*;
-import com.sc2002.arena.combatant.*;
-import com.sc2002.arena.skill.*;
+import com.sc2002.arena.action.ActionContext;
+import com.sc2002.arena.action.ActionResult;
+
+import com.sc2002.arena.combatant.Combatant;
+import com.sc2002.arena.combatant.Player;
+
+import com.sc2002.arena.skill.SkillUseMode;
 
 public final class PowerStone implements Item {
     @Override

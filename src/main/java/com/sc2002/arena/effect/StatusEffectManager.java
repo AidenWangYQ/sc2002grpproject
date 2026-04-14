@@ -1,7 +1,10 @@
 package com.sc2002.arena.effect;
 
-import java.util.*;
-import com.sc2002.arena.combatant.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.sc2002.arena.combatant.Combatant;
+
 import com.sc2002.arena.strategy.BattleContext;
 
 public final class StatusEffectManager {

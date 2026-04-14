@@ -1,6 +1,7 @@
 package com.sc2002.arena.action;
 
-import com.sc2002.arena.combatant.*;
+import com.sc2002.arena.combatant.Combatant;
+
 import com.sc2002.arena.strategy.BattleContext;
 
 public final class BasicAttackAction implements CombatAction {

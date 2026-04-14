@@ -1,6 +1,6 @@
 package com.sc2002.arena.strategy;
 
-import com.sc2002.arena.model.combatant.Combatant;
+import com.sc2002.arena.combatant.Combatant;
 
 import java.util.ArrayList;
 import java.util.Comparator;

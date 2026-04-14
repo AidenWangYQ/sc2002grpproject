@@ -1,9 +1,14 @@
 package com.sc2002.arena.skill;
 
-import java.util.*;
-import com.sc2002.arena.action.*;
-import com.sc2002.arena.combatant.*;
-import com.sc2002.arena.effect.*;
+import java.util.List;
+
+import com.sc2002.arena.action.ActionContext;
+import com.sc2002.arena.action.ActionResult;
+
+import com.sc2002.arena.combatant.Combatant;
+
+import com.sc2002.arena.effect.AttackBuffEffect;
+
 import com.sc2002.arena.strategy.BattleContext;
 
 public final class ArcaneBlastSkill implements SpecialSkill {

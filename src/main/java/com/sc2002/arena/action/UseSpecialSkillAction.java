@@ -1,8 +1,9 @@
 package com.sc2002.arena.action;
 
+import com.sc2002.arena.combatant.Combatant;
+import com.sc2002.arena.combatant.Player;
 
-import com.sc2002.arena.combatant.*;
-import com.sc2002.arena.skill.*;
+import com.sc2002.arena.skill.SkillUseMode;
 
 public final class UseSpecialSkillAction implements CombatAction {
     @Override

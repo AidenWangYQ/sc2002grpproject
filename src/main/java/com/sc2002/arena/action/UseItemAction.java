@@ -1,6 +1,7 @@
 package com.sc2002.arena.action;
 
-import com.sc2002.arena.combatant.*;
+import com.sc2002.arena.combatant.Combatant;
+import com.sc2002.arena.combatant.Player;
 
 public final class UseItemAction implements CombatAction {
     @Override

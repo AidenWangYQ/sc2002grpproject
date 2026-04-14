@@ -1,7 +1,9 @@
 package com.sc2002.arena.action;
 
-import java.util.*;
-import com.sc2002.arena.combatant.*;
+import java.util.Objects;
+
+import com.sc2002.arena.combatant.Combatant;
+
 import com.sc2002.arena.strategy.BattleContext;
 
 public final class ActionContext {

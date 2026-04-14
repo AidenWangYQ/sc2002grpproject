@@ -1,7 +1,11 @@
 package com.sc2002.arena.combatant;
 
-import java.util.*;
-import com.sc2002.arena.effect.*;
+import java.util.List;
+import java.util.Objects;
+
+import com.sc2002.arena.effect.StatusEffect;
+import com.sc2002.arena.effect.StatusEffectManager;
+
 import com.sc2002.arena.strategy.BattleContext;
 
 

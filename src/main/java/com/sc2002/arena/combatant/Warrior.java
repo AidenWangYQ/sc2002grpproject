@@ -1,7 +1,8 @@
 package com.sc2002.arena.combatant;
 
-import com.sc2002.arena.item.*;
-import com.sc2002.arena.skill.*;
+import com.sc2002.arena.item.Inventory;
+
+import com.sc2002.arena.skill.ShieldBashSkill;
 
 public final class Warrior extends Player {
     public Warrior(Inventory inventory) {
