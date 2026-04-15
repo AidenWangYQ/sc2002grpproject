@@ -1,0 +1,67 @@
+@startuml
+title SC2002 Turn-Based Combat Arena - Battle Sequence Diagram
+
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 30
+
+actor Player
+control GameController
+boundary UI
+control BattleEngine
+control TurnManager
+control ActionResolver
+entity Combatant
+entity Enemy
+
+== Game Setup ==
+Player -> GameController : startGame()
+GameController -> UI : promptPlayerSetup()
+UI --> GameController : player + items + difficulty
+
+GameController -> BattleEngine : initializeBattle()
+BattleEngine -> UI : displayInitialEnemies()
+
+== Battle Loop ==
+loop Each Round
+    BattleEngine -> UI : displayRound()
+
+    BattleEngine -> TurnManager : determineTurnOrder()
+
+    loop Each Turn
+        TurnManager -> UI : displayTurn()
+
+        alt Player Turn
+            UI --> TurnManager : selectAction()
+
+            alt Attack / Skill
+                TurnManager -> ActionResolver : resolveAction()
+                ActionResolver -> Combatant : applyDamage() / applyEffect()
+            else Item
+                TurnManager -> ActionResolver : applyItem()
+                ActionResolver -> Combatant : applyItemEffect()
+            end
+
+        else Enemy Turn
+            TurnManager -> ActionResolver : enemyAction()
+            ActionResolver -> Enemy : executeEnemyAction()
+            ActionResolver -> Combatant : applyDamage()
+        end
+
+        ActionResolver -> BattleEngine : updateState()
+        BattleEngine -> UI : displayResult()
+
+        alt Battle Ends
+            break
+        end
+    end
+
+    alt Initial wave defeated
+        BattleEngine -> BattleEngine : spawnBackupWave()
+        BattleEngine -> UI : displayBackupWave()
+    end
+end
+
+== End ==
+BattleEngine -> UI : displayOutcome()
+
+@enduml
