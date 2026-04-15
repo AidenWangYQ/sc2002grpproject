@@ -1,7 +1,9 @@
 package com.sc2002.arena;
 
+import com.sc2002.arena.BattleUI.GameController;
+
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Game starting...");
+        new GameController().run();
     }
 }
