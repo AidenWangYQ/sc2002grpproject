@@ -1,67 +1,91 @@
 @startuml
-title SC2002 Turn-Based Combat Arena - Battle Sequence Diagram
+title SC2002 Turn-Based Combat Arena - Sequence Diagram
 
 skinparam sequenceMessageAlign center
-skinparam ParticipantPadding 30
+skinparam ParticipantPadding 25
+skinparam BoxPadding 10
+skinparam ResponseMessageBelowArrow true
+skinparam maxMessageSize 70
 
 actor Player
+boundary BattleUI as UI
 control GameController
-boundary UI
 control BattleEngine
 control TurnManager
 control ActionResolver
-entity Combatant
-entity Enemy
+entity Warrior
+entity Goblin
+entity DefendEffect
+entity StunEffect
+entity Potion
 
-== Game Setup ==
-Player -> GameController : startGame()
-GameController -> UI : promptPlayerSetup()
-UI --> GameController : player + items + difficulty
+Player -> UI : start battle
+UI -> GameController : initializeGame()
+GameController -> BattleEngine : startBattle()
+BattleEngine -> TurnManager : beginRound()
 
-GameController -> BattleEngine : initializeBattle()
-BattleEngine -> UI : displayInitialEnemies()
+== Turn 1: Goblin basic attack ==
+TurnManager -> ActionResolver : resolveEnemyAttack(Goblin, Warrior)
+ActionResolver -> Goblin : getAttackValue()
+Goblin --> ActionResolver : attack
+ActionResolver -> Warrior : getDefenseValue()
+Warrior --> ActionResolver : defense
+ActionResolver -> Warrior : receiveDamage(rawDamage)
+ActionResolver --> TurnManager : attack resolved
+TurnManager -> UI : displayAttackResult()
 
-== Battle Loop ==
-loop Each Round
-    BattleEngine -> UI : displayRound()
+== Turn 2: Warrior defends ==
+UI -> TurnManager : selectAction(Defend)
+TurnManager -> ActionResolver : resolveDefend(Warrior)
+ActionResolver -> Warrior : applyEffect(DefendEffect)
+ActionResolver --> TurnManager : defend resolved
+TurnManager -> UI : displayDefendResult()
 
-    BattleEngine -> TurnManager : determineTurnOrder()
+== Turn 3: Goblin basic attack against defended Warrior ==
+TurnManager -> ActionResolver : resolveEnemyAttack(Goblin, Warrior)
+ActionResolver -> Goblin : getAttackValue()
+Goblin --> ActionResolver : attack
+ActionResolver -> Warrior : getModifiedDefenseValue()
+Warrior --> ActionResolver : boosted defense
+ActionResolver -> Warrior : receiveDamage(reducedDamage)
+ActionResolver --> TurnManager : reduced attack resolved
+TurnManager -> UI : displayReducedDamageResult()
 
-    loop Each Turn
-        TurnManager -> UI : displayTurn()
+== Turn 4: Warrior uses Shield Bash ==
+UI -> TurnManager : selectAction(Shield Bash)
+TurnManager -> ActionResolver : resolveSkill(Warrior, Goblin)
+ActionResolver -> Goblin : receiveDamage(skillDamage)
+ActionResolver -> Goblin : applyEffect(StunEffect)
+ActionResolver --> TurnManager : skill resolved
+TurnManager -> UI : displaySkillResult()
 
-        alt Player Turn
-            UI --> TurnManager : selectAction()
+== Turn 5: Goblin is stunned ==
+TurnManager -> Goblin : canAct()
+Goblin --> TurnManager : false
+TurnManager -> UI : displaySkipTurn("Goblin is stunned")
 
-            alt Attack / Skill
-                TurnManager -> ActionResolver : resolveAction()
-                ActionResolver -> Combatant : applyDamage() / applyEffect()
-            else Item
-                TurnManager -> ActionResolver : applyItem()
-                ActionResolver -> Combatant : applyItemEffect()
-            end
+== Turn 6: Warrior uses Potion ==
+UI -> TurnManager : selectAction(Use Potion)
+TurnManager -> ActionResolver : resolveItemUse(Warrior, Potion)
+ActionResolver -> Warrior : heal()
+ActionResolver --> TurnManager : item resolved
+TurnManager -> UI : displayHealResult()
 
-        else Enemy Turn
-            TurnManager -> ActionResolver : enemyAction()
-            ActionResolver -> Enemy : executeEnemyAction()
-            ActionResolver -> Combatant : applyDamage()
-        end
+== Turn 7: Goblin is still stunned ==
+TurnManager -> Goblin : canAct()
+Goblin --> TurnManager : false
+TurnManager -> UI : displaySkipTurn("Goblin is stunned")
 
-        ActionResolver -> BattleEngine : updateState()
-        BattleEngine -> UI : displayResult()
+== Turn 8: Warrior basic attacks and defeats Goblin ==
+UI -> TurnManager : selectAction(Basic Attack)
+TurnManager -> ActionResolver : resolvePlayerAttack(Warrior, Goblin)
+ActionResolver -> Warrior : getAttackValue()
+Warrior --> ActionResolver : attack
+ActionResolver -> Goblin : receiveDamage(finalDamage)
+ActionResolver -> Goblin : isAlive()
+Goblin --> ActionResolver : false
+ActionResolver --> TurnManager : goblin defeated
+TurnManager -> UI : displayDefeatResult()
 
-        alt Battle Ends
-            break
-        end
-    end
-
-    alt Initial wave defeated
-        BattleEngine -> BattleEngine : spawnBackupWave()
-        BattleEngine -> UI : displayBackupWave()
-    end
-end
-
-== End ==
-BattleEngine -> UI : displayOutcome()
-
+BattleEngine -> UI : displayBattleOutcome()
 @enduml
