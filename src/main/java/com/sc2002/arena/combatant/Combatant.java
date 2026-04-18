@@ -8,8 +8,9 @@ import com.sc2002.arena.effect.StatusEffectManager;
 
 import com.sc2002.arena.strategy.BattleContext;
 
-
 public abstract class Combatant {
+    private static final double BASE_CRITICAL_CHANCE = 0.10;
+
     private final String name;
     private final int maxHp;
     private final int baseAttack;
@@ -17,7 +18,6 @@ public abstract class Combatant {
     private final int speed;
     private final StatusEffectManager statusEffectManager;
     private int currentHp;
-    private int specialSkillCooldown;
 
     protected Combatant(String name, int maxHp, int baseAttack, int baseDefense, int speed) {
         this.name = Objects.requireNonNull(name, "name cannot be null");
@@ -34,7 +34,6 @@ public abstract class Combatant {
         this.speed = speed;
         this.currentHp = maxHp;
         this.statusEffectManager = new StatusEffectManager();
-        this.specialSkillCooldown = 0;
     }
 
     public String getName() {
@@ -61,21 +60,16 @@ public abstract class Combatant {
         return speed;
     }
 
-    public int getSpecialSkillCooldown() {
-        return specialSkillCooldown;
-    }
-
-    public void setSpecialSkillCooldown(int specialSkillCooldown) {
-        validateNonNegative(specialSkillCooldown, "specialSkillCooldown");
-        this.specialSkillCooldown = specialSkillCooldown;
-    }
-
     public int getEffectiveAttack(BattleContext context) {
         return statusEffectManager.modifyAttack(this, baseAttack, context);
     }
 
     public int getEffectiveDefense(BattleContext context) {
         return statusEffectManager.modifyDefense(this, baseDefense, context);
+    }
+
+    public double getCriticalChance(BattleContext context) {
+        return statusEffectManager.modifyCriticalChance(this, BASE_CRITICAL_CHANCE, context);
     }
 
     public boolean isAlive() {
@@ -119,7 +113,6 @@ public abstract class Combatant {
 
     public void onTurnEnd(BattleContext context) {
         statusEffectManager.onTurnEnd(this, context);
-        tickSpecialSkillCooldown();
     }
 
     public void onRoundEnd(BattleContext context) {
@@ -128,12 +121,6 @@ public abstract class Combatant {
 
     public void removeExpiredEffects() {
         statusEffectManager.removeExpiredEffects();
-    }
-
-    private void tickSpecialSkillCooldown() {
-        if (specialSkillCooldown > 0) {
-            specialSkillCooldown--;
-        }
     }
 
     private void validateNonNegative(int value, String fieldName) {
