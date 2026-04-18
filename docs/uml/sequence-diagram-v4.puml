@@ -1,0 +1,176 @@
+@startuml BattleSequence_Diagram
+autonumber
+skinparam responseMessageBelowArrow true
+skinparam sequenceParticipant underline false
+
+actor Player
+
+boundary "ConsoleBattleUI" as UI
+control "TurnManager" as TM
+control "ActionResolver" as AR
+entity "Warrior: Player" as W
+entity "Goblin: Enemy" as G
+entity "StatusEffectManager\n(Warrior)" as WSEM
+entity "StatusEffectManager\n(Goblin)" as GSEM
+entity "DefendAction" as DefAct
+entity "BasicAttackAction" as BAA
+entity "UseSpecialSkillAction" as SkillAct
+entity "ShieldBashSkill" as SBS
+entity "UseItemAction" as ItemAct
+entity "Inventory" as INV
+entity "HealPotion" as POT
+
+== Enemy turn: Goblin basic attacks Warrior ==
+
+TM -> G: chooseAction(context)
+G --> TM: BasicAttackAction
+TM -> G: chooseTarget(context)
+G --> TM: Warrior
+TM -> BAA: execute(actionContext)
+BAA -> AR: prepareAttack(G, context, result)
+AR --> BAA: PreparedAttack
+BAA -> AR: applyDamage(G, W, atkValue, context)
+AR -> W: receiveDamage(rawDamage, G, context)
+W -> WSEM: modifyIncomingDamage(...)
+WSEM --> W: adjustedDamage
+W --> AR: appliedDamage
+AR --> BAA: DamageResolution
+BAA --> TM: ActionResult
+TM -> UI: printActionResult(result)
+
+== Player turn: Warrior defends ==
+
+TM -> UI: promptPlayerAction(W, actions, enemies)
+Player --> UI: choose Defend
+UI --> TM: DefendAction
+TM -> DefAct: execute(actionContext)
+DefAct -> W: applyEffect(DefendEffect, context)
+W -> WSEM: addEffect(DefendEffect, W, context)
+WSEM --> W: effect added
+DefAct --> TM: ActionResult
+TM -> UI: printActionResult(result)
+
+== Enemy turn: Goblin attacks, reduced by Defend ==
+
+TM -> G: chooseAction(context)
+G --> TM: BasicAttackAction
+TM -> G: chooseTarget(context)
+G --> TM: Warrior
+TM -> BAA: execute(actionContext)
+BAA -> AR: prepareAttack(G, context, result)
+AR --> BAA: PreparedAttack
+BAA -> AR: applyDamage(G, W, atkValue, context)
+AR -> W: receiveDamage(rawDamage, G, context)
+W -> WSEM: modifyIncomingDamage(...)
+note right of WSEM
+Warrior's effective defense is increased
+by DefendEffect for this round and next.
+end note
+WSEM --> W: reducedDamage
+W --> AR: appliedDamage
+AR --> BAA: DamageResolution
+BAA --> TM: ActionResult
+TM -> UI: printActionResult(result)
+
+== Player turn: Warrior uses Shield Bash on Goblin ==
+
+TM -> UI: promptPlayerAction(W, actions, enemies)
+Player --> UI: choose SpecialSkill
+UI --> TM: UseSpecialSkillAction
+TM -> UI: promptTargetSelection(livingEnemies)
+Player --> UI: choose Goblin
+UI --> TM: Goblin
+TM -> SkillAct: execute(actionContext)
+SkillAct -> W: getSpecialSkill()
+W --> SkillAct: ShieldBashSkill
+SkillAct -> SBS: use(actionContext, NORMAL)
+SBS -> AR: prepareAttack(W, context, result)
+AR --> SBS: PreparedAttack
+SBS -> AR: applyDamage(W, G, atkValue, context)
+AR -> G: receiveDamage(rawDamage, W, context)
+G -> GSEM: modifyIncomingDamage(...)
+GSEM --> G: adjustedDamage
+G --> AR: appliedDamage
+AR --> SBS: DamageResolution
+
+alt Goblin survives
+    SBS -> G: applyEffect(StunEffect, context)
+    G -> GSEM: addEffect(StunEffect, G, context)
+    GSEM --> G: effect added
+else Goblin defeated immediately
+    SBS -> SBS: recordDefeat(G)
+end
+
+SBS --> SkillAct: ActionResult
+SkillAct -> W: setSpecialSkillCooldown(3)
+SkillAct --> TM: ActionResult
+TM -> UI: printActionResult(result)
+
+== Enemy turn: Goblin stunned, skips turn ==
+
+TM -> G: onTurnStart(context)
+G -> GSEM: onTurnStart(G, context)
+GSEM --> G: updated effects
+TM -> G: canAct()
+G -> GSEM: preventsAction()
+GSEM --> G: true
+G --> TM: false
+TM -> UI: printCannotAct(G)
+
+== Player turn: Warrior uses Potion ==
+
+TM -> UI: promptPlayerAction(W, actions, enemies)
+Player --> UI: choose Item
+UI --> TM: UseItemAction
+TM -> UI: promptItemSlotSelection(W, availableSlots)
+Player --> UI: choose Potion slot
+UI --> TM: slot index
+TM -> ItemAct: execute(actionContext)
+ItemAct -> W: getInventory()
+W --> ItemAct: Inventory
+ItemAct -> INV: useItem(slotIndex, actionContext)
+INV -> POT: use(actionContext)
+POT -> W: heal(100)
+W --> POT: healed amount
+POT --> INV: ActionResult
+INV --> ItemAct: ActionResult
+ItemAct --> TM: ActionResult
+TM -> UI: printActionResult(result)
+
+== Enemy turn: Goblin stunned, skips turn again ==
+
+TM -> G: onTurnStart(context)
+G -> GSEM: onTurnStart(G, context)
+GSEM --> G: updated effects
+TM -> G: canAct()
+G -> GSEM: preventsAction()
+GSEM --> G: true
+G --> TM: false
+TM -> UI: printCannotAct(G)
+
+== Player turn: Warrior basic attacks and eliminates Goblin ==
+
+TM -> UI: promptPlayerAction(W, actions, enemies)
+Player --> UI: choose BasicAttack
+UI --> TM: BasicAttackAction
+TM -> UI: promptTargetSelection(livingEnemies)
+Player --> UI: choose Goblin
+UI --> TM: Goblin
+TM -> BAA: execute(actionContext)
+BAA -> AR: prepareAttack(W, context, result)
+AR --> BAA: PreparedAttack
+BAA -> AR: applyDamage(W, G, atkValue, context)
+AR -> G: receiveDamage(rawDamage, W, context)
+G -> GSEM: modifyIncomingDamage(...)
+GSEM --> G: adjustedDamage
+G --> AR: appliedDamage
+AR --> BAA: DamageResolution
+BAA --> TM: ActionResult
+TM -> UI: printActionResult(result)
+
+note over G
+Goblin HP reaches 0.
+Goblin is eliminated.
+end note
+
+@enduml

@@ -1,0 +1,43 @@
+@startuml Class Diagram - System Overview 
+left to right direction
+skinparam packageStyle rectangle
+
+package "UI Layer" {
+    interface BattleUI
+    class ConsoleBattleUI
+}
+
+package "Controller" {
+    class GameController
+}
+
+package "Engine Layer" {
+    class BattleEngine
+    class TurnManager
+    class ActionResolver
+    class BattleState
+    class SpawnManager
+}
+
+package "Domain Layer" {
+    class Combatant
+}
+
+package "Level System" {
+    class Level
+}
+
+ConsoleBattleUI ..|> BattleUI
+
+GameController --> BattleEngine
+GameController --> BattleUI
+
+BattleEngine --> TurnManager
+BattleEngine --> BattleState
+BattleEngine --> SpawnManager
+BattleEngine --> BattleUI
+
+SpawnManager --> Level
+BattleState --> Combatant
+
+@enduml
