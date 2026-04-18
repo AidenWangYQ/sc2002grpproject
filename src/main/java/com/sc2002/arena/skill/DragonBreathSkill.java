@@ -4,18 +4,15 @@ import java.util.List;
 
 import com.sc2002.arena.action.ActionContext;
 import com.sc2002.arena.action.ActionResult;
-
 import com.sc2002.arena.combatant.Combatant;
-
+import com.sc2002.arena.effect.DragonBreathCriticalEffect;
 import com.sc2002.arena.engine.ActionResolver;
-import com.sc2002.arena.effect.AttackBuffEffect;
-
 import com.sc2002.arena.strategy.BattleContext;
 
-public final class ArcaneBlastSkill implements SpecialSkill {
+public final class DragonBreathSkill implements SpecialSkill {
     @Override
     public String getName() {
-        return "Arcane Blast";
+        return "Dragon Breath";
     }
 
     @Override
@@ -29,13 +26,19 @@ public final class ArcaneBlastSkill implements SpecialSkill {
         BattleContext battleContext = context.getBattleContext();
         List<Combatant> targets = battleContext.getLivingOpponentsOf(actor);
         if (targets.isEmpty()) {
-            throw new IllegalStateException("Arcane Blast requires at least one living enemy.");
+            throw new IllegalStateException("Dragon Breath requires at least one living opponent.");
         }
 
-        int defeatedCount = 0;
         ActionResult result = ActionResult.forAction(actor, getName());
         ActionResolver actionResolver = context.getActionResolver();
-        ActionResolver.PreparedAttack preparedAttack = actionResolver.prepareAttack(actor, battleContext, result);
+        ActionResolver.PreparedAttack preparedAttack = actionResolver.prepareGuaranteedCriticalAttack(
+                actor,
+                battleContext,
+                result,
+                new DragonBreathCriticalEffect(),
+                "Dragon Breath Critical x1.5",
+                "Dragon Breath lands a guaranteed critical hit."
+        );
 
         for (Combatant target : targets) {
             if (!target.isAlive()) {
@@ -50,15 +53,10 @@ public final class ArcaneBlastSkill implements SpecialSkill {
             result.recordDamage(actor, target, damage.beforeHp(), damage.rawDamage(), damage.appliedDamage(), damage.afterHp());
             if (!target.isAlive()) {
                 result.recordDefeat(target);
-                defeatedCount++;
             }
         }
 
-        if (defeatedCount > 0) {
-            int attackBonus = defeatedCount * 10;
-            actor.applyEffect(new AttackBuffEffect(attackBonus), battleContext);
-            result.recordEffect(actor, "Arcane Blast ATK Bonus +" + attackBonus);
-        }
+        result.recordNote("Dragon Breath scorches all living opponents.");
         if (mode == SkillUseMode.POWER_STONE_TRIGGER) {
             result.recordNote("Triggered by Power Stone.");
         }

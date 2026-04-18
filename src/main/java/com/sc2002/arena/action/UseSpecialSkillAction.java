@@ -1,7 +1,7 @@
 package com.sc2002.arena.action;
 
 import com.sc2002.arena.combatant.Combatant;
-import com.sc2002.arena.combatant.Player;
+import com.sc2002.arena.combatant.SpecialSkillUser;
 
 import com.sc2002.arena.skill.SkillUseMode;
 
@@ -19,20 +19,20 @@ public final class UseSpecialSkillAction implements CombatAction {
     @Override
     public ActionResult execute(ActionContext context) {
         Combatant actor = context.getActor();
-        if (!(actor instanceof Player player)) {
-            throw new IllegalStateException("Only players can use special skills.");
+        if (!(actor instanceof SpecialSkillUser skillUser)) {
+            throw new IllegalStateException("Only skill-bearing combatants can use special skills.");
         }
         if (!actor.isAlive()) {
             throw new IllegalStateException(actor.getName() + " cannot use a special skill after being eliminated.");
         }
-        if (player.getSpecialSkillCooldown() > 0) {
-            throw new IllegalStateException("Special skill is on cooldown for " + player.getSpecialSkillCooldown() + " more turn(s).");
+        if (skillUser.getSpecialSkillCooldown() > 0) {
+            throw new IllegalStateException("Special skill is on cooldown for " + skillUser.getSpecialSkillCooldown() + " more turn(s).");
         }
 
-        int cooldownBefore = player.getSpecialSkillCooldown();
-        ActionResult result = player.getSpecialSkill().use(context, SkillUseMode.NORMAL);
-        player.setSpecialSkillCooldown(3);
-        result.recordCooldownChange(cooldownBefore, player.getSpecialSkillCooldown());
+        int cooldownBefore = skillUser.getSpecialSkillCooldown();
+        ActionResult result = skillUser.getSpecialSkill().use(context, SkillUseMode.NORMAL);
+        skillUser.setSpecialSkillCooldown(skillUser.getSpecialSkillCooldownDuration());
+        result.recordCooldownChange(cooldownBefore, skillUser.getSpecialSkillCooldown());
         return result;
     }
 }

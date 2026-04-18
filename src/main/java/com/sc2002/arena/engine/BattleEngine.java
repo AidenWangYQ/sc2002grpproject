@@ -7,13 +7,13 @@ import com.sc2002.arena.combatant.Combatant;
 import com.sc2002.arena.level.SpawnManager;
 
 public class BattleEngine {
-    private final BattleContext context;
+    private final BattleState context;
     private final TurnManager turnManager;
     private final SpawnManager spawnManager;
     private final BattleUI ui;
 
     public BattleEngine(
-            BattleContext context,
+            BattleState context,
             TurnManager turnManager,
             SpawnManager spawnManager,
             BattleUI ui

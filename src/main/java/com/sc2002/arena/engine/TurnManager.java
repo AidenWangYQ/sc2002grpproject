@@ -11,6 +11,7 @@ import com.sc2002.arena.action.UseSpecialSkillAction;
 import com.sc2002.arena.combatant.Combatant;
 import com.sc2002.arena.combatant.Enemy;
 import com.sc2002.arena.combatant.Player;
+import com.sc2002.arena.combatant.SpecialSkillUser;
 import com.sc2002.arena.item.Inventory;
 import com.sc2002.arena.item.PowerStone;
 import com.sc2002.arena.strategy.TurnOrderStrategy;
@@ -26,11 +27,11 @@ public class TurnManager {
         this.ui = ui;
     }
 
-    public List<Combatant> generateTurnOrder(BattleContext context) {
+    public List<Combatant> generateTurnOrder(BattleState context) {
         return strategy.getOrder(context.getLivingCombatants());
     }
 
-    public TurnResolution processTurn(Combatant current, BattleContext context) {
+    public TurnResolution processTurn(Combatant current, BattleState context) {
         if (!current.isAlive()) {
             return TurnResolution.skipped(current);
         }
@@ -41,6 +42,7 @@ public class TurnManager {
         if (!current.canAct()) {
             ui.printCannotAct(current);
             current.onTurnEnd(context);
+            tickSkillCooldownIfNeeded(current);
             current.removeExpiredEffects();
             return TurnResolution.skipped(current);
         }
@@ -59,11 +61,12 @@ public class TurnManager {
 
         ActionResult result = actionResolver.resolve(action, actionContext);
         current.onTurnEnd(context);
+        tickSkillCooldownIfNeeded(current);
         current.removeExpiredEffects();
         return TurnResolution.performed(current, result);
     }
 
-    private ActionContext buildPlayerActionContext(Player player, CombatAction action, BattleContext context) {
+    private ActionContext buildPlayerActionContext(Player player, CombatAction action, BattleState context) {
         if (action instanceof UseItemAction) {
             List<Inventory.InventorySlot> availableSlots = player.getInventory().getSlots().stream()
                     .filter(Inventory.InventorySlot::isUsable)
@@ -73,22 +76,33 @@ public class TurnManager {
             boolean needsTarget = selectedSlot.item() instanceof PowerStone
                     && player.getSpecialSkill().requiresTarget();
             Combatant target = needsTarget ? ui.promptTargetSelection(context.getLivingEnemies()) : null;
-            return ActionContext.forItemAction(player, target, slotIndex, context);
+            return ActionContext.forItemAction(player, target, slotIndex, context, actionResolver);
         }
 
-        boolean needsTarget = action.requiresTarget()
-                || (action instanceof UseSpecialSkillAction && player.getSpecialSkill().requiresTarget());
+        boolean needsTarget = action.requiresTarget() || requiresSpecialSkillTarget(action, player);
         if (needsTarget) {
-            return ActionContext.forTargetedAction(player, ui.promptTargetSelection(context.getLivingEnemies()), context);
+            return ActionContext.forTargetedAction(player, ui.promptTargetSelection(context.getLivingEnemies()), context, actionResolver);
         }
-        return ActionContext.forUntargetedAction(player, context);
+        return ActionContext.forUntargetedAction(player, context, actionResolver);
     }
 
-    private ActionContext buildEnemyActionContext(Enemy enemy, CombatAction action, BattleContext context) {
-        if (action.requiresTarget()) {
-            return ActionContext.forTargetedAction(enemy, enemy.chooseTarget(context), context);
+    private ActionContext buildEnemyActionContext(Enemy enemy, CombatAction action, BattleState context) {
+        if (action.requiresTarget() || requiresSpecialSkillTarget(action, enemy)) {
+            return ActionContext.forTargetedAction(enemy, enemy.chooseTarget(context), context, actionResolver);
         }
-        return ActionContext.forUntargetedAction(enemy, context);
+        return ActionContext.forUntargetedAction(enemy, context, actionResolver);
+    }
+
+    private boolean requiresSpecialSkillTarget(CombatAction action, Combatant actor) {
+        return action instanceof UseSpecialSkillAction
+                && actor instanceof SpecialSkillUser skillUser
+                && skillUser.getSpecialSkill().requiresTarget();
+    }
+
+    private void tickSkillCooldownIfNeeded(Combatant current) {
+        if (current instanceof SpecialSkillUser skillUser) {
+            skillUser.tickSpecialSkillCooldown();
+        }
     }
 
     private Inventory.InventorySlot findSlotByIndex(List<Inventory.InventorySlot> availableSlots, int slotIndex) {

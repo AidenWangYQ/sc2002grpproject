@@ -7,7 +7,7 @@ import com.sc2002.arena.action.CombatAction;
 import com.sc2002.arena.combatant.Combatant;
 import com.sc2002.arena.combatant.Enemy;
 import com.sc2002.arena.combatant.Player;
-import com.sc2002.arena.engine.BattleContext;
+import com.sc2002.arena.engine.BattleState;
 import com.sc2002.arena.item.Inventory;
 
 public interface BattleUI {
@@ -23,11 +23,11 @@ public interface BattleUI {
 
     void printBackupSpawn(List<Enemy> backup);
 
-    void printRoundSummary(BattleContext context);
+    void printRoundSummary(BattleState context);
 
-    void printVictoryScreen(BattleContext context);
+    void printVictoryScreen(BattleState context);
 
-    void printDefeatScreen(BattleContext context);
+    void printDefeatScreen(BattleState context);
 
     CombatAction promptPlayerAction(Player player, List<CombatAction> availableActions, List<Enemy> livingEnemies);
 

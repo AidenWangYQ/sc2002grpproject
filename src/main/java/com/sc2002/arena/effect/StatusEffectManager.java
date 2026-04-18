@@ -28,6 +28,14 @@ public final class StatusEffectManager {
         return Math.max(0, modifiedDamage);
     }
 
+    public double modifyCriticalChance(Combatant target, double criticalChance, BattleContext context) {
+        double modifiedCriticalChance = criticalChance;
+        for (StatusEffect effect : List.copyOf(activeEffects)) {
+            modifiedCriticalChance = effect.modifyCriticalChance(target, modifiedCriticalChance, context);
+        }
+        return Math.max(0.0, Math.min(1.0, modifiedCriticalChance));
+    }
+
     public int modifyAttack(Combatant target, int attack, BattleContext context) {
         int modifiedAttack = attack;
         for (StatusEffect effect : List.copyOf(activeEffects)) {
