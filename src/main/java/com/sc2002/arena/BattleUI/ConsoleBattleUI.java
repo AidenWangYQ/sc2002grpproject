@@ -25,19 +25,24 @@ public class ConsoleBattleUI implements BattleUI {
 
     @Override
     public void printRoundHeader(int roundNumber) {
-        System.out.println();
-        System.out.println("=== Round " + roundNumber + " ===");
+        System.out.printf("\n=== Round %d ===\n", roundNumber);
     }
 
     @Override
     public void printTurnHeader(Combatant combatant) {
+<<<<<<< Updated upstream
         System.out.println();
         System.out.println("Turn: " + combatant.getName());
+=======
+        System.out.printf("------------- Turn------------\n");
+        System.out.println(combatant.getName());
+        System.out.println("  " + formatCombatantStatus(combatant));
+>>>>>>> Stashed changes
     }
 
     @Override
     public void printActionResult(ActionResult result) {
-        System.out.println(result.getActor().getName() + " used " + result.getActionName() + ".");
+        System.out.println(" "+result.getActor().getName() + " used " + result.getActionName() + ".");
         for (ActionResult.DamageEvent event : result.getDamageEvents()) {
             System.out.printf("  %s took %d damage (%d -> %d).%n",
                     event.target().getName(),
@@ -56,18 +61,18 @@ public class ConsoleBattleUI implements BattleUI {
             System.out.printf("  %s gained effect: %s.%n", event.target().getName(), event.effectName());
         }
         for (ActionResult.DefeatEvent event : result.getDefeatEvents()) {
-            System.out.println("  " + event.target().getName() + " was defeated.");
+            System.out.println(event.target().getName() + " was defeated.");
         }
         for (String note : result.getNotes()) {
-            System.out.println("  " + note);
+            System.out.println(note);
         }
         if (result.getConsumedItem() != null) {
-            System.out.printf("  Consumed item: %s (slot %d).%n",
+            System.out.printf("Consumed item: %s (slot %d).%n",
                     result.getConsumedItem().itemName(),
                     result.getConsumedItem().slotIndex() + 1);
         }
         if (result.getCooldownChange() != null) {
-            System.out.printf("  Cooldown: %d -> %d.%n",
+            System.out.printf("Cooldown: %d -> %d.%n",
                     result.getCooldownChange().before(),
                     result.getCooldownChange().after());
         }
@@ -82,16 +87,33 @@ public class ConsoleBattleUI implements BattleUI {
     public void printBackupSpawn(List<Enemy> backup) {
         System.out.println("Backup wave has arrived.");
         for (Enemy enemy : backup) {
-            System.out.println("  " + enemy.getName());
+            System.out.println(enemy.getName());
         }
     }
 
     @Override
+<<<<<<< Updated upstream
     public void printRoundSummary(BattleContext context) {
         System.out.printf("Player HP: %d/%d | Remaining enemies: %d%n",
                 context.getPlayer().getCurrentHp(),
                 context.getPlayer().getMaxHp(),
                 context.getRemainingEnemyCount());
+=======
+    public void printRoundSummary(BattleState context) {
+        System.out.println("\nRound Summary:");
+        System.out.println("Player Status:");
+        System.out.println(formatCombatantStatus(context.getPlayer()));
+        System.out.println("Enemy Status:");
+        List<Enemy> livingEnemies = context.getLivingEnemies();
+        if (livingEnemies.isEmpty()) {
+            System.out.println("  None");
+        } else {
+            for (Enemy enemy : livingEnemies) {
+                System.out.println("  " + formatCombatantStatus(enemy));
+            }
+        }
+        System.out.printf("Remaining enemies: %d%n", context.getRemainingEnemyCount());
+>>>>>>> Stashed changes
     }
 
     @Override
@@ -144,7 +166,7 @@ public class ConsoleBattleUI implements BattleUI {
         return availableSlots.get(readIntInRange(1, availableSlots.size()) - 1).index();
     }
 
-    private int readIntInRange(int min, int max) {
+    public int readIntInRange(int min, int max) {
         while (true) {
             try {
                 int value = Integer.parseInt(scanner.nextLine().trim());
@@ -156,4 +178,26 @@ public class ConsoleBattleUI implements BattleUI {
             System.out.printf("Enter a number between %d and %d.%n", min, max);
         }
     }
+<<<<<<< Updated upstream
+=======
+
+    public String formatCombatantStatus(Combatant combatant) {
+        StringBuilder status = new StringBuilder();
+        status.append(combatant.getName())
+                .append(" HP ")
+                .append(combatant.getCurrentHp())
+                .append("/")
+                .append(combatant.getMaxHp());
+
+        if (combatant instanceof SpecialSkillUser skillUser) {
+            status.append(" | Skill CD: ").append(skillUser.getSpecialSkillCooldown());
+        }
+
+        String effects = combatant.getActiveEffects().stream()
+                .map(effect -> effect.getName())
+                .collect(Collectors.joining(", "));
+        status.append(" | Effects: ").append(effects.isEmpty() ? "None" : effects);
+        return status.toString();
+    }
+>>>>>>> Stashed changes
 }
