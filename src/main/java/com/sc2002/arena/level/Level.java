@@ -10,7 +10,7 @@ package com.sc2002.arena.level;
  */
 public class Level {
  
-    public enum Difficulty { EASY, MEDIUM, HARD }
+    public enum Difficulty { EASY, MEDIUM, HARD, BOSS }
  
     private final Difficulty difficulty;
     private final int levelNumber;

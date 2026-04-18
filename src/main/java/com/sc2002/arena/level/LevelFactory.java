@@ -1,5 +1,6 @@
 package com.sc2002.arena.level;
 
+import com.sc2002.arena.combatant.Dragon;
 import com.sc2002.arena.combatant.Goblin;
 import com.sc2002.arena.combatant.Wolf;
  
@@ -24,6 +25,7 @@ public class LevelFactory {
             case 1 -> createEasy();
             case 2 -> createMedium();
             case 3 -> createHard();
+            case 4 -> createBoss();
             default -> throw new IllegalArgumentException(
                     "Unknown level number: " + levelNumber);
         };
@@ -62,6 +64,14 @@ public class LevelFactory {
                 new Wolf("Wolf B")
         ));
         return new Level(3, Level.Difficulty.HARD, initial, backup);
+    }
+
+    private static Level createBoss() {
+        Wave initial = new Wave(List.of(
+                new Dragon("Ancient Dragon")
+        ));
+        Wave backup = new Wave(List.of());
+        return new Level(4, Level.Difficulty.BOSS, initial, backup);
     }
 }
  

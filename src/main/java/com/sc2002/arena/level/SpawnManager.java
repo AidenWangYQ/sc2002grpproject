@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.sc2002.arena.BattleUI.BattleUI;
 import com.sc2002.arena.combatant.Enemy;
-import com.sc2002.arena.engine.BattleContext;
+import com.sc2002.arena.engine.BattleState;
 
 public class SpawnManager {
     private final Level level;
@@ -15,14 +15,14 @@ public class SpawnManager {
         this.ui = ui;
     }
 
-    public void spawnInitialWave(BattleContext context) {
+    public void spawnInitialWave(BattleState context) {
         for (Enemy enemy : level.getInitialWave().getEnemies()) {
             context.addInitialEnemy(enemy);
         }
         ui.printMessage("Initial wave spawned: " + describeEnemies(level.getInitialWave().getEnemies()));
     }
 
-    public boolean triggerBackupIfReady(BattleContext context) {
+    public boolean triggerBackupIfReady(BattleState context) {
         if (!hasBackupWave() || context.isBackupSpawned() || !context.allActiveEnemiesDefeated()) {
             return false;
         }
