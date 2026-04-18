@@ -1,4 +1,4 @@
-package com.sc2002.arena.BattleUI;
+package com.sc2002.arena.battleUI;
 
 import java.util.List;
 import java.util.Scanner;

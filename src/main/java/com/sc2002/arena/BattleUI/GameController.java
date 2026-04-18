@@ -1,4 +1,4 @@
-package com.sc2002.arena.BattleUI;
+package com.sc2002.arena.battleUI;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,8 +8,8 @@ import com.sc2002.arena.combatant.Player;
 import com.sc2002.arena.combatant.Warrior;
 import com.sc2002.arena.combatant.Wizard;
 import com.sc2002.arena.engine.ActionResolver;
-import com.sc2002.arena.engine.BattleState;
 import com.sc2002.arena.engine.BattleEngine;
+import com.sc2002.arena.engine.BattleState;
 import com.sc2002.arena.engine.TurnManager;
 import com.sc2002.arena.item.HealPotion;
 import com.sc2002.arena.item.Inventory;

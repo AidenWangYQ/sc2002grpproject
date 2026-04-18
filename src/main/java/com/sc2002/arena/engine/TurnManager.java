@@ -2,12 +2,12 @@ package com.sc2002.arena.engine;
 
 import java.util.List;
 
-import com.sc2002.arena.BattleUI.BattleUI;
 import com.sc2002.arena.action.ActionContext;
 import com.sc2002.arena.action.ActionResult;
 import com.sc2002.arena.action.CombatAction;
 import com.sc2002.arena.action.UseItemAction;
 import com.sc2002.arena.action.UseSpecialSkillAction;
+import com.sc2002.arena.battleUI.BattleUI;
 import com.sc2002.arena.combatant.Combatant;
 import com.sc2002.arena.combatant.Enemy;
 import com.sc2002.arena.combatant.Player;
