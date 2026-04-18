@@ -7,20 +7,24 @@ import com.sc2002.arena.combatant.Combatant;
 import com.sc2002.arena.combatant.Enemy;
 import com.sc2002.arena.combatant.Player;
 
-public class BattleContext implements com.sc2002.arena.strategy.BattleContext {
-    private final Player player;
+public class BattleState implements com.sc2002.arena.strategy.BattleContext {
+    private final List<Player> players = new ArrayList<>();
     private final List<Enemy> allEnemies = new ArrayList<>();
     private final List<Enemy> activeEnemies = new ArrayList<>();
 
     private int roundNumber = 0;
     private boolean backupSpawned = false;
 
-    public BattleContext(Player player) {
-        this.player = player;
+    public BattleState(Player player) {
+        players.add(player);
     }
 
     public Player getPlayer() {
-        return player;
+        return players.getFirst();
+    }
+
+    public List<Player> getLivingPlayers() {
+        return players.stream().filter(Combatant::isAlive).toList();
     }
 
     public void addInitialEnemy(Enemy enemy) {
@@ -40,9 +44,7 @@ public class BattleContext implements com.sc2002.arena.strategy.BattleContext {
 
     public List<Combatant> getLivingCombatants() {
         List<Combatant> combatants = new ArrayList<>();
-        if (player.isAlive()) {
-            combatants.add(player);
-        }
+        combatants.addAll(getLivingPlayers());
         combatants.addAll(getLivingEnemies());
         return List.copyOf(combatants);
     }
@@ -73,25 +75,25 @@ public class BattleContext implements com.sc2002.arena.strategy.BattleContext {
     }
 
     @Override
-    public List<Combatant> getAliveEnemiesOf(Combatant actor) {
+    public List<Combatant> getLivingOpponentsOf(Combatant actor) {
         validateActor(actor);
-        if (actor == player) {
+        if (players.contains(actor)) {
             return List.copyOf(getLivingEnemies());
         }
-        return player.isAlive() ? List.of(player) : List.of();
+        return getLivingPlayers().stream().map(Combatant.class::cast).toList();
     }
 
     @Override
-    public List<Combatant> getAlliesOf(Combatant actor) {
+    public List<Combatant> getLivingAlliesOf(Combatant actor) {
         validateActor(actor);
-        if (actor == player) {
-            return player.isAlive() ? List.of(player) : List.of();
+        if (players.contains(actor)) {
+            return getLivingPlayers().stream().map(Combatant.class::cast).toList();
         }
         return activeEnemies.stream().filter(Combatant::isAlive).map(Combatant.class::cast).toList();
     }
 
     private void validateActor(Combatant actor) {
-        if (actor == player) {
+        if (players.contains(actor)) {
             return;
         }
         if (activeEnemies.contains(actor)) {
