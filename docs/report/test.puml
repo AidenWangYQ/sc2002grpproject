@@ -1,0 +1,101 @@
+@startuml
+scale 0.6
+title SC2002 Turn-Based Combat Arena - Sequence Diagram
+
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 25
+skinparam BoxPadding 10
+skinparam ResponseMessageBelowArrow true
+skinparam maxMessageSize 70
+skinparam dpi 200
+
+actor Player
+boundary BattleUI as UI
+control GameController
+control BattleEngine
+control TurnManager
+control ActionResolver
+entity Warrior
+entity Goblin
+entity DefendEffect
+entity StunEffect
+entity Potion
+
+Player -> UI : start battle
+UI -> GameController : initializeGame()
+GameController -> BattleEngine : startBattle()
+BattleEngine -> TurnManager : beginRound()
+
+loop Battle turns until Goblin defeated
+
+group Turn 1: Goblin basic attack
+    TurnManager -> ActionResolver : resolveEnemyAttack(Goblin, Warrior)
+    ActionResolver -> Goblin : getAttackValue()
+    Goblin --> ActionResolver : attack
+    ActionResolver -> Warrior : getDefenseValue()
+    Warrior --> ActionResolver : defense
+    ActionResolver -> Warrior : receiveDamage(rawDamage)
+    TurnManager -> UI : displayAttackResult()
+end
+
+group Turn 2: Warrior defends
+    UI -> TurnManager : selectAction(Defend)
+    TurnManager -> ActionResolver : resolveDefend(Warrior)
+    ActionResolver -> Warrior : applyEffect(DefendEffect)
+    TurnManager -> UI : displayDefendResult()
+end
+
+group Turn 3: Goblin attacks defended Warrior
+    TurnManager -> ActionResolver : resolveEnemyAttack(Goblin, Warrior)
+    ActionResolver -> Goblin : getAttackValue()
+    Goblin --> ActionResolver : attack
+    ActionResolver -> Warrior : getModifiedDefenseValue()
+    Warrior --> ActionResolver : boosted defense
+    ActionResolver -> Warrior : receiveDamage(reducedDamage)
+    TurnManager -> UI : displayReducedDamageResult()
+end
+
+group Turn 4: Warrior uses Shield Bash
+    UI -> TurnManager : selectAction(Shield Bash)
+    TurnManager -> ActionResolver : resolveSkill(Warrior, Goblin)
+    ActionResolver -> Goblin : receiveDamage(skillDamage)
+    ActionResolver -> Goblin : applyEffect(StunEffect)
+    TurnManager -> UI : displaySkillResult()
+end
+
+group Turn 5: Goblin is stunned
+    TurnManager -> Goblin : canAct()
+    Goblin --> TurnManager : false
+    TurnManager -> UI : displaySkipTurn("Goblin is stunned")
+end
+
+group Turn 6: Warrior uses Potion
+    UI -> TurnManager : selectAction(Use Potion)
+    TurnManager -> ActionResolver : resolveItemUse(Warrior, Potion)
+    ActionResolver -> Warrior : heal()
+    TurnManager -> UI : displayHealResult()
+end
+
+group Turn 7: Goblin still stunned
+    TurnManager -> Goblin : canAct()
+    Goblin --> TurnManager : false
+    TurnManager -> UI : displaySkipTurn("Goblin is stunned")
+end
+
+group Turn 8: Warrior defeats Goblin
+    UI -> TurnManager : selectAction(Basic Attack)
+    TurnManager -> ActionResolver : resolvePlayerAttack(Warrior, Goblin)
+    ActionResolver -> Warrior : getAttackValue()
+    Warrior --> ActionResolver : attack
+    ActionResolver -> Goblin : receiveDamage(finalDamage)
+    ActionResolver -> Goblin : isAlive()
+    Goblin --> ActionResolver : false
+    TurnManager -> UI : displayDefeatResult()
+    break
+end
+
+end
+
+BattleEngine -> UI : displayBattleOutcome()
+
+@enduml
