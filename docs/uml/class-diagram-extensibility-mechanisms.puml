@@ -1,0 +1,104 @@
+@startuml Class Diagram - Extensibility Mechanisms
+skinparam classAttributeIconSize 0
+
+package "Actions" {
+interface CombatAction {
+    execute()
+}
+class BasicAttackAction
+class DefendAction
+class UseItemAction
+class UseSpecialSkillAction
+}
+
+package "Items" {
+interface Item {
+    use()
+}
+class HealPotion
+class PowerStone
+class RagePotion
+class SmokeBomb
+class Inventory
+}
+
+package "Effects" {
+abstract class StatusEffect
+class StunEffect
+class RageEffect
+class DefendEffect
+class StatusEffectManager
+}
+
+package "Skills" {
+interface SpecialSkill {
+    use()
+}
+class ShieldBashSkill
+class ArcaneBlastSkill
+class DragonBreathSkill
+}
+
+CombatAction <|.. BasicAttackAction
+CombatAction <|.. DefendAction
+CombatAction <|.. UseItemAction
+CombatAction <|.. UseSpecialSkillAction
+
+Item <|.. HealPotion
+Item <|.. PowerStone
+Item <|.. RagePotion
+Item <|.. SmokeBomb
+Inventory --> Item
+
+StatusEffect <|-- StunEffect
+StatusEffect <|-- RageEffect
+StatusEffect <|-- DefendEffect
+StatusEffectManager --> StatusEffect
+
+SpecialSkill <|.. ShieldBashSkill
+SpecialSkill <|.. ArcaneBlastSkill
+SpecialSkill <|.. DragonBreathSkill
+
+UseItemAction --> Item
+UseSpecialSkillAction --> SpecialSkill
+
+note top of CombatAction
+<<OCP>><<Polymorphism>>
+New actions are added as new classes
+implementing CombatAction without
+changing battle orchestration.
+end note
+
+note top of Item
+<<OCP>><<Polymorphism>>
+Each item encapsulates its own use
+behaviour behind a common interface.
+end note
+
+note top of StatusEffect
+<<OCP>><<Polymorphism>>
+Effects extend StatusEffect and modify
+behaviour through overridden hooks.
+end note
+
+note top of SpecialSkill
+<<OCP>><<Polymorphism>>
+Each skill provides its own use logic
+while remaining callable through the
+same abstraction.
+end note
+
+note right of Inventory
+<<SRP>>
+Tracks item slots, usage state,
+and consumption only.
+end note
+
+note right of StatusEffectManager
+<<SRP>>
+Applies active effects and removes
+expired ones, instead of pushing this
+logic into Combatant.
+end note
+
+@enduml

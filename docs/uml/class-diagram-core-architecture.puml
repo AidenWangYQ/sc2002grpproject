@@ -1,0 +1,110 @@
+@startuml Class Diagram - Core Architecture
+skinparam classAttributeIconSize 0
+
+package "Core Domain" {
+
+abstract class Combatant {
+    name
+    currentHp
+    attack
+    defense
+    speed
+}
+
+abstract class Player {
+    inventory
+    specialSkill
+}
+
+abstract class Enemy {
+    actionStrategy
+}
+
+class Warrior
+class Wizard
+class Goblin
+class Wolf
+class Dragon
+
+interface SpecialSkillUser
+
+}
+
+package "Engine" {
+
+class BattleEngine
+class TurnManager
+class ActionResolver
+class BattleState
+
+interface TurnOrderStrategy
+class SpeedBasedTurnOrderStrategy
+
+interface EnemyActionStrategy
+
+}
+
+Combatant <|-- Player
+Combatant <|-- Enemy
+
+Player <|-- Warrior
+Player <|-- Wizard
+
+Enemy <|-- Goblin
+Enemy <|-- Wolf
+Enemy <|-- Dragon
+
+Player ..|> SpecialSkillUser
+Dragon ..|> SpecialSkillUser
+
+TurnOrderStrategy <|.. SpeedBasedTurnOrderStrategy
+
+BattleEngine --> TurnManager
+BattleEngine --> BattleState
+TurnManager --> TurnOrderStrategy
+TurnManager --> ActionResolver
+Enemy --> EnemyActionStrategy
+BattleState --> Combatant
+
+note top of Combatant
+<<LSP>>
+Player and Enemy can both be treated
+uniformly as Combatant in battle flow.
+end note
+
+note right of SpecialSkillUser
+<<ISP>>
+Only entities that can use skills
+implement this interface.
+Combatant is not bloated with
+skill-specific operations.
+end note
+
+note right of TurnOrderStrategy
+<<OCP>><<DIP>>
+TurnManager depends on a turn-order
+abstraction, so new ordering rules
+can be added without changing it.
+end note
+
+note right of EnemyActionStrategy
+<<OCP>><<DIP>>
+Enemy behaviour is delegated to a
+strategy abstraction instead of being
+hardcoded into Enemy or BattleEngine.
+end note
+
+note right of TurnManager
+<<SRP>>
+Responsible for turn flow and
+action-context construction, not
+damage calculation.
+end note
+
+note right of ActionResolver
+<<SRP>>
+Responsible for resolving action
+effects such as damage and status.
+end note
+
+@enduml
