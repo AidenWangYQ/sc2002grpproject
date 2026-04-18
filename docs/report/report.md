@@ -55,6 +55,8 @@ Object-oriented principles such as encapsulation, inheritance, and polymorphism 
 
 ### 3.2 Sequence Diagram
 
+![Sequence Diagram](test.png)
+
 The sequence diagram illustrates runtime interactions between system components.
 
 It captures:
