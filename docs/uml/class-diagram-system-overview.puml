@@ -1,13 +1,14 @@
-@startuml Class Diagram - System Overview 
+@startuml SystemOverview
 left to right direction
 skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
 
 package "UI Layer" {
     interface BattleUI
     class ConsoleBattleUI
 }
 
-package "Controller" {
+package "Controller Layer" {
     class GameController
 }
 
@@ -20,24 +21,48 @@ package "Engine Layer" {
 }
 
 package "Domain Layer" {
-    class Combatant
+    abstract class Combatant
 }
 
-package "Level System" {
+package "Level Layer" {
     class Level
 }
 
 ConsoleBattleUI ..|> BattleUI
 
-GameController --> BattleEngine
-GameController --> BattleUI
+GameController ..> BattleUI
+GameController ..> BattleEngine
 
+BattleEngine ..> BattleUI
 BattleEngine --> TurnManager
 BattleEngine --> BattleState
 BattleEngine --> SpawnManager
-BattleEngine --> BattleUI
+
+TurnManager --> ActionResolver
 
 SpawnManager --> Level
+SpawnManager ..> BattleUI
+
 BattleState --> Combatant
+
+note right of BattleUI
+<<DIP>>
+UI interaction is abstracted behind
+BattleUI so core logic does not depend
+on a concrete console implementation.
+end note
+
+note right of GameController
+<<SRP>>
+Coordinates setup flow, dependency
+construction, and replay loop only.
+end note
+
+note right of BattleEngine
+<<SRP>>
+Controls battle progression and
+victory conditions, not low-level
+action resolution.
+end note
 
 @enduml
