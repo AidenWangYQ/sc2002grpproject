@@ -1,6 +1,6 @@
 package com.sc2002.arena.level;
 
-import com.sc2002.arena.model.combatant.Enemy;
+import com.sc2002.arena.combatant.Enemy;
 import java.util.List;
  
 /**

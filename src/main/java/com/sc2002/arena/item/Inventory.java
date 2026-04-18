@@ -1,7 +1,11 @@
 package com.sc2002.arena.item;
 
-import java.util.*;
-import com.sc2002.arena.action.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import com.sc2002.arena.action.ActionContext;
+import com.sc2002.arena.action.ActionResult;
 
 public final class Inventory {
     private final List<SlotState> slots = new ArrayList<>();
