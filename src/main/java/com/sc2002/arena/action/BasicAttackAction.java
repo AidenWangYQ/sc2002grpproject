@@ -2,6 +2,8 @@ package com.sc2002.arena.action;
 
 import com.sc2002.arena.combatant.Combatant;
 
+import com.sc2002.arena.engine.ActionResolver;
+
 import com.sc2002.arena.strategy.BattleContext;
 
 public final class BasicAttackAction implements CombatAction {
@@ -22,15 +24,16 @@ public final class BasicAttackAction implements CombatAction {
         BattleContext battleContext = context.getBattleContext();
         validateCombatants(actor, target);
 
-        int attack = actor.getEffectiveAttack(battleContext);
-        int defense = target.getEffectiveDefense(battleContext);
-        int rawDamage = Math.max(0, attack - defense);
-        int beforeHp = target.getCurrentHp();
-        int appliedDamage = target.receiveDamage(rawDamage, actor, battleContext);
-        int afterHp = target.getCurrentHp();
-
         ActionResult result = ActionResult.forAction(actor, getName());
-        result.recordDamage(actor, target, beforeHp, rawDamage, appliedDamage, afterHp);
+        ActionResolver actionResolver = context.getActionResolver();
+        ActionResolver.PreparedAttack preparedAttack = actionResolver.prepareAttack(actor, battleContext, result);
+        ActionResolver.DamageResolution damage = actionResolver.applyDamage(
+                actor,
+                target,
+                preparedAttack.attackValue(),
+                battleContext
+        );
+        result.recordDamage(actor, target, damage.beforeHp(), damage.rawDamage(), damage.appliedDamage(), damage.afterHp());
         if (!target.isAlive()) {
             result.recordDefeat(target);
         }

@@ -5,6 +5,7 @@ import com.sc2002.arena.action.ActionResult;
 
 import com.sc2002.arena.combatant.Combatant;
 
+import com.sc2002.arena.engine.ActionResolver;
 import com.sc2002.arena.effect.StunEffect;
 
 import com.sc2002.arena.strategy.BattleContext;
@@ -33,13 +34,16 @@ public final class ShieldBashSkill implements SpecialSkill {
             throw new IllegalStateException(target.getName() + " is already eliminated.");
         }
 
-        int rawDamage = Math.max(0, actor.getEffectiveAttack(battleContext) - target.getEffectiveDefense(battleContext));
-        int beforeHp = target.getCurrentHp();
-        int appliedDamage = target.receiveDamage(rawDamage, actor, battleContext);
-        int afterHp = target.getCurrentHp();
-
         ActionResult result = ActionResult.forAction(actor, getName());
-        result.recordDamage(actor, target, beforeHp, rawDamage, appliedDamage, afterHp);
+        ActionResolver actionResolver = context.getActionResolver();
+        ActionResolver.PreparedAttack preparedAttack = actionResolver.prepareAttack(actor, battleContext, result);
+        ActionResolver.DamageResolution damage = actionResolver.applyDamage(
+                actor,
+                target,
+                preparedAttack.attackValue(),
+                battleContext
+        );
+        result.recordDamage(actor, target, damage.beforeHp(), damage.rawDamage(), damage.appliedDamage(), damage.afterHp());
         if (target.isAlive()) {
             target.applyEffect(new StunEffect(), battleContext);
             result.recordEffect(target, "Stun");

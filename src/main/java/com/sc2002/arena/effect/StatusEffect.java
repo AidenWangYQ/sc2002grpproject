@@ -29,6 +29,10 @@ public abstract class StatusEffect {
     public void onRoundEnd(Combatant target, BattleContext context) {
     }
 
+    public double modifyCriticalChance(Combatant target, double criticalChance, BattleContext context) {
+        return criticalChance;
+    }
+
     public int modifyIncomingDamage(Combatant target, Combatant attacker, int damage, BattleContext context) {
         return damage;
     }
