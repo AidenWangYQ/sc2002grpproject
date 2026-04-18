@@ -8,13 +8,14 @@ import com.sc2002.arena.combatant.Player;
 import com.sc2002.arena.combatant.Warrior;
 import com.sc2002.arena.combatant.Wizard;
 import com.sc2002.arena.engine.ActionResolver;
-import com.sc2002.arena.engine.BattleContext;
+import com.sc2002.arena.engine.BattleState;
 import com.sc2002.arena.engine.BattleEngine;
 import com.sc2002.arena.engine.TurnManager;
+import com.sc2002.arena.item.HealPotion;
 import com.sc2002.arena.item.Inventory;
 import com.sc2002.arena.item.Item;
-import com.sc2002.arena.item.Potion;
 import com.sc2002.arena.item.PowerStone;
+import com.sc2002.arena.item.RagePotion;
 import com.sc2002.arena.item.SmokeBomb;
 import com.sc2002.arena.level.Level;
 import com.sc2002.arena.level.LevelFactory;
@@ -50,7 +51,7 @@ public class GameController {
     }
 
     private BattleEngine buildEngine(Player player, Level level) {
-        BattleContext context = new BattleContext(player);
+        BattleState context = new BattleState(player);
         ActionResolver actionResolver = new ActionResolver();
         TurnManager turnManager = new TurnManager(new SpeedBasedTurnOrderStrategy(), actionResolver, ui);
         SpawnManager spawnManager = new SpawnManager(level, ui);
@@ -62,7 +63,7 @@ public class GameController {
         System.out.println("TURN-BASED COMBAT ARENA");
         System.out.println("1) Warrior  HP:260 ATK:40 DEF:20 SPD:30");
         System.out.println("2) Wizard   HP:200 ATK:50 DEF:10 SPD:20");
-        System.out.println("Items: Potion, Power Stone, Smoke Bomb");
+        System.out.println("Items: Heal Potion, Power Stone, Smoke Bomb, Rage Potion");
     }
 
     private Player promptPlayerChoice() {
@@ -73,14 +74,14 @@ public class GameController {
     }
 
     private Inventory promptInventorySelection() {
-        String[] itemNames = { "Potion", "Power Stone", "Smoke Bomb" };
+        String[] itemNames = { "Heal Potion", "Power Stone", "Smoke Bomb", "Rage Potion" };
         List<Item> startingItems = new ArrayList<>();
         System.out.println("Choose your first item:");
         printItemMenu(itemNames);
-        startingItems.add(createItem(itemNames[readIntInRange(1, 3) - 1]));
+        startingItems.add(createItem(itemNames[readIntInRange(1, 4) - 1]));
         System.out.println("Choose your second item:");
         printItemMenu(itemNames);
-        startingItems.add(createItem(itemNames[readIntInRange(1, 3) - 1]));
+        startingItems.add(createItem(itemNames[readIntInRange(1, 4) - 1]));
         return new Inventory(startingItems);
     }
 
@@ -92,16 +93,21 @@ public class GameController {
 
     private Item createItem(String itemName) {
         return switch (itemName) {
-            case "Potion" -> new Potion();
+            case "Heal Potion" -> new HealPotion();
             case "Power Stone" -> new PowerStone();
             case "Smoke Bomb" -> new SmokeBomb();
+            case "Rage Potion" -> new RagePotion();
             default -> throw new IllegalArgumentException("Unknown item: " + itemName);
         };
     }
 
     private Level promptDifficultyChoice() {
-        System.out.println("Choose difficulty: 1) Easy  2) Medium  3) Hard");
-        int choice = readIntInRange(1, 3);
+        System.out.println("Choose difficulty:");
+        System.out.println("1) Easy   - Three goblins.");
+        System.out.println("2) Medium - Goblin and wolf, then two wolves.");
+        System.out.println("3) Hard   - Two goblins, then a mixed backup wave.");
+        System.out.println("4) Boss   - Ancient Dragon with Dragon Breath.");
+        int choice = readIntInRange(1, 4);
         return LevelFactory.create(choice);
     }
 

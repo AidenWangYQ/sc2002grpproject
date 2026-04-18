@@ -2,13 +2,15 @@ package com.sc2002.arena.BattleUI;
 
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import com.sc2002.arena.action.ActionResult;
 import com.sc2002.arena.action.CombatAction;
 import com.sc2002.arena.combatant.Combatant;
 import com.sc2002.arena.combatant.Enemy;
 import com.sc2002.arena.combatant.Player;
-import com.sc2002.arena.engine.BattleContext;
+import com.sc2002.arena.combatant.SpecialSkillUser;
+import com.sc2002.arena.engine.BattleState;
 import com.sc2002.arena.item.Inventory;
 
 public class ConsoleBattleUI implements BattleUI {
@@ -33,6 +35,7 @@ public class ConsoleBattleUI implements BattleUI {
     public void printTurnHeader(Combatant combatant) {
         System.out.println();
         System.out.println("Turn: " + combatant.getName());
+        System.out.println("  " + formatCombatantStatus(combatant));
     }
 
     @Override
@@ -87,15 +90,23 @@ public class ConsoleBattleUI implements BattleUI {
     }
 
     @Override
-    public void printRoundSummary(BattleContext context) {
-        System.out.printf("Player HP: %d/%d | Remaining enemies: %d%n",
-                context.getPlayer().getCurrentHp(),
-                context.getPlayer().getMaxHp(),
-                context.getRemainingEnemyCount());
+    public void printRoundSummary(BattleState context) {
+        System.out.println("Player Status:");
+        System.out.println("  " + formatCombatantStatus(context.getPlayer()));
+        System.out.println("Enemy Status:");
+        List<Enemy> livingEnemies = context.getLivingEnemies();
+        if (livingEnemies.isEmpty()) {
+            System.out.println("  None");
+        } else {
+            for (Enemy enemy : livingEnemies) {
+                System.out.println("  " + formatCombatantStatus(enemy));
+            }
+        }
+        System.out.printf("Remaining enemies: %d%n", context.getRemainingEnemyCount());
     }
 
     @Override
-    public void printVictoryScreen(BattleContext context) {
+    public void printVictoryScreen(BattleState context) {
         System.out.printf("Victory in %d round(s). Remaining HP: %d/%d%n",
                 context.getRoundNumber(),
                 context.getPlayer().getCurrentHp(),
@@ -103,7 +114,7 @@ public class ConsoleBattleUI implements BattleUI {
     }
 
     @Override
-    public void printDefeatScreen(BattleContext context) {
+    public void printDefeatScreen(BattleState context) {
         System.out.printf("Defeat after %d round(s). Enemies remaining: %d%n",
                 context.getRoundNumber(),
                 context.getRemainingEnemyCount());
@@ -155,5 +166,24 @@ public class ConsoleBattleUI implements BattleUI {
             }
             System.out.printf("Enter a number between %d and %d.%n", min, max);
         }
+    }
+
+    private String formatCombatantStatus(Combatant combatant) {
+        StringBuilder status = new StringBuilder();
+        status.append(combatant.getName())
+                .append(" HP ")
+                .append(combatant.getCurrentHp())
+                .append("/")
+                .append(combatant.getMaxHp());
+
+        if (combatant instanceof SpecialSkillUser skillUser) {
+            status.append(" | Skill CD: ").append(skillUser.getSpecialSkillCooldown());
+        }
+
+        String effects = combatant.getActiveEffects().stream()
+                .map(effect -> effect.getName())
+                .collect(Collectors.joining(", "));
+        status.append(" | Effects: ").append(effects.isEmpty() ? "None" : effects);
+        return status.toString();
     }
 }
