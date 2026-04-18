@@ -1,42 +1,50 @@
-@startuml Class Diagram - Extensibility Mechanisms
+@startuml ExtensibilityMechanisms
 skinparam classAttributeIconSize 0
 
 package "Actions" {
-interface CombatAction {
-    execute()
-}
-class BasicAttackAction
-class DefendAction
-class UseItemAction
-class UseSpecialSkillAction
+    interface CombatAction {
+        execute()
+    }
+    class BasicAttackAction
+    class DefendAction
+    class UseItemAction
+    class UseSpecialSkillAction
 }
 
 package "Items" {
-interface Item {
-    use()
-}
-class HealPotion
-class PowerStone
-class RagePotion
-class SmokeBomb
-class Inventory
+    interface Item {
+        use()
+    }
+    class HealPotion
+    class PowerStone
+    class RagePotion
+    class SmokeBomb
+    class Inventory
 }
 
 package "Effects" {
-abstract class StatusEffect
-class StunEffect
-class RageEffect
-class DefendEffect
-class StatusEffectManager
+    abstract class StatusEffect
+    abstract class AbstractCriticalEffect
+    class CriticalEffect
+    class DragonBreathCriticalEffect
+    class StunEffect
+    class RageEffect
+    class DefendEffect
+    class AttackBuffEffect
+    class StatusEffectManager
 }
 
 package "Skills" {
-interface SpecialSkill {
-    use()
+    interface SpecialSkill {
+        use()
+    }
+    class ShieldBashSkill
+    class ArcaneBlastSkill
+    class DragonBreathSkill
 }
-class ShieldBashSkill
-class ArcaneBlastSkill
-class DragonBreathSkill
+
+package "Shared Domain Dependency" {
+    abstract class Combatant
 }
 
 CombatAction <|.. BasicAttackAction
@@ -50,10 +58,15 @@ Item <|.. RagePotion
 Item <|.. SmokeBomb
 Inventory --> Item
 
+StatusEffect <|-- AbstractCriticalEffect
+AbstractCriticalEffect <|-- CriticalEffect
+AbstractCriticalEffect <|-- DragonBreathCriticalEffect
 StatusEffect <|-- StunEffect
 StatusEffect <|-- RageEffect
 StatusEffect <|-- DefendEffect
+StatusEffect <|-- AttackBuffEffect
 StatusEffectManager --> StatusEffect
+Combatant --> StatusEffectManager
 
 SpecialSkill <|.. ShieldBashSkill
 SpecialSkill <|.. ArcaneBlastSkill

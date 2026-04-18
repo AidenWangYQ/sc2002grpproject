@@ -1,4 +1,4 @@
-@startuml Class Diagram - Core Architecture
+@startuml CoreArchitecture
 skinparam classAttributeIconSize 0
 
 package "Core Domain" {
@@ -6,14 +6,15 @@ package "Core Domain" {
 abstract class Combatant {
     name
     currentHp
-    attack
-    defense
+    baseAttack
+    baseDefense
     speed
 }
 
 abstract class Player {
     inventory
     specialSkill
+    specialSkillCooldown
 }
 
 abstract class Enemy {
@@ -36,11 +37,17 @@ class BattleEngine
 class TurnManager
 class ActionResolver
 class BattleState
+enum BattleOutcome
 
 interface TurnOrderStrategy
 class SpeedBasedTurnOrderStrategy
 
 interface EnemyActionStrategy
+class BasicAttackEnemyActionStrategy
+class DragonEnemyActionStrategy
+
+interface BattleContext
+interface BattleUI
 
 }
 
@@ -57,12 +64,20 @@ Enemy <|-- Dragon
 Player ..|> SpecialSkillUser
 Dragon ..|> SpecialSkillUser
 
+BattleState ..|> BattleContext
+
 TurnOrderStrategy <|.. SpeedBasedTurnOrderStrategy
+EnemyActionStrategy <|.. BasicAttackEnemyActionStrategy
+EnemyActionStrategy <|.. DragonEnemyActionStrategy
 
 BattleEngine --> TurnManager
 BattleEngine --> BattleState
+BattleEngine ..> BattleOutcome
+
 TurnManager --> TurnOrderStrategy
 TurnManager --> ActionResolver
+TurnManager ..> BattleUI
+
 Enemy --> EnemyActionStrategy
 BattleState --> Combatant
 
@@ -74,10 +89,10 @@ end note
 
 note right of SpecialSkillUser
 <<ISP>>
-Only entities that can use skills
-implement this interface.
-Combatant is not bloated with
-skill-specific operations.
+Only entities that can use special
+skills implement this interface.
+Combatant stays focused on shared
+battle behaviour.
 end note
 
 note right of TurnOrderStrategy
