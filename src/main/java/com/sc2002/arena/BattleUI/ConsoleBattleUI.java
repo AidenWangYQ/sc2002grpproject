@@ -2,13 +2,15 @@ package com.sc2002.arena.BattleUI;
 
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import com.sc2002.arena.action.ActionResult;
 import com.sc2002.arena.action.CombatAction;
 import com.sc2002.arena.combatant.Combatant;
 import com.sc2002.arena.combatant.Enemy;
 import com.sc2002.arena.combatant.Player;
-import com.sc2002.arena.engine.BattleContext;
+import com.sc2002.arena.combatant.SpecialSkillUser;
+import com.sc2002.arena.engine.BattleState;
 import com.sc2002.arena.item.Inventory;
 
 public class ConsoleBattleUI implements BattleUI {
@@ -30,19 +32,15 @@ public class ConsoleBattleUI implements BattleUI {
 
     @Override
     public void printTurnHeader(Combatant combatant) {
-<<<<<<< Updated upstream
-        System.out.println();
-        System.out.println("Turn: " + combatant.getName());
-=======
         System.out.printf("------------- Turn------------\n");
         System.out.println(combatant.getName());
         System.out.println("  " + formatCombatantStatus(combatant));
->>>>>>> Stashed changes
     }
 
     @Override
     public void printActionResult(ActionResult result) {
-        System.out.println(" "+result.getActor().getName() + " used " + result.getActionName() + ".");
+        System.out.println("-------------Action Performed------------");
+        System.out.println("-->"+result.getActor().getName() + " used " + result.getActionName() + ".");
         for (ActionResult.DamageEvent event : result.getDamageEvents()) {
             System.out.printf("  %s took %d damage (%d -> %d).%n",
                     event.target().getName(),
@@ -92,13 +90,6 @@ public class ConsoleBattleUI implements BattleUI {
     }
 
     @Override
-<<<<<<< Updated upstream
-    public void printRoundSummary(BattleContext context) {
-        System.out.printf("Player HP: %d/%d | Remaining enemies: %d%n",
-                context.getPlayer().getCurrentHp(),
-                context.getPlayer().getMaxHp(),
-                context.getRemainingEnemyCount());
-=======
     public void printRoundSummary(BattleState context) {
         System.out.println("\nRound Summary:");
         System.out.println("Player Status:");
@@ -113,11 +104,10 @@ public class ConsoleBattleUI implements BattleUI {
             }
         }
         System.out.printf("Remaining enemies: %d%n", context.getRemainingEnemyCount());
->>>>>>> Stashed changes
     }
 
     @Override
-    public void printVictoryScreen(BattleContext context) {
+    public void printVictoryScreen(BattleState context) {
         System.out.printf("Victory in %d round(s). Remaining HP: %d/%d%n",
                 context.getRoundNumber(),
                 context.getPlayer().getCurrentHp(),
@@ -125,7 +115,7 @@ public class ConsoleBattleUI implements BattleUI {
     }
 
     @Override
-    public void printDefeatScreen(BattleContext context) {
+    public void printDefeatScreen(BattleState context) {
         System.out.printf("Defeat after %d round(s). Enemies remaining: %d%n",
                 context.getRoundNumber(),
                 context.getRemainingEnemyCount());
@@ -178,8 +168,6 @@ public class ConsoleBattleUI implements BattleUI {
             System.out.printf("Enter a number between %d and %d.%n", min, max);
         }
     }
-<<<<<<< Updated upstream
-=======
 
     public String formatCombatantStatus(Combatant combatant) {
         StringBuilder status = new StringBuilder();
@@ -199,5 +187,4 @@ public class ConsoleBattleUI implements BattleUI {
         status.append(" | Effects: ").append(effects.isEmpty() ? "None" : effects);
         return status.toString();
     }
->>>>>>> Stashed changes
 }
