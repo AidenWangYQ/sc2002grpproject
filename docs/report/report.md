@@ -57,7 +57,7 @@ Object-oriented principles such as encapsulation, inheritance, and polymorphism 
 
 ![Sequence Diagram](test.png)
 
-The sequence diagram illustrates runtime interactions between system components.
+The sequence diagram illustrates runtime interactions between boundary, control, and entity objects in the system
 
 It captures:
 
@@ -65,14 +65,14 @@ It captures:
 * Turn-based battle loop
 * Player and enemy actions
 * Action resolution and state updates
-* Backup enemy spawning
+* Enemy action handling and state transitions
 * Battle termination
 
 Interaction fragments used:
 
-* **loop** → for rounds and turns
-* **alt** → for conditional flows (player vs enemy, action types)
-* **break** → for battle termination
+* **loop** → represents repeated rounds and turn cycles
+* **alt** → models conditional flows (player vs enemy, action outcomes)
+* **break** → represents battle termination when a combatant is defeated
 
 
 
