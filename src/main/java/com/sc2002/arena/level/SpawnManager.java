@@ -2,7 +2,7 @@ package com.sc2002.arena.level;
 
 import java.util.List;
 
-import com.sc2002.arena.BattleUI.BattleUI;
+import com.sc2002.arena.battleUI.BattleUI;
 import com.sc2002.arena.combatant.Enemy;
 import com.sc2002.arena.engine.BattleState;
 
