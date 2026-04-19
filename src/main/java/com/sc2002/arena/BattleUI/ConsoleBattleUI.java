@@ -1,4 +1,4 @@
-package com.sc2002.arena.BattleUI;
+package com.sc2002.arena.battleUI;
 
 import java.util.List;
 import java.util.Scanner;
@@ -28,25 +28,35 @@ public class ConsoleBattleUI implements BattleUI {
     @Override
     public void printRoundHeader(int roundNumber) {
         System.out.println();
-        System.out.println("=== Round " + roundNumber + " ===");
+        System.out.println("Round " + roundNumber); 
+        System.out.println("==================================");
+
     }
 
     @Override
     public void printTurnHeader(Combatant combatant) {
         System.out.println();
-        System.out.println("Turn: " + combatant.getName());
-        System.out.println("  " + formatCombatantStatus(combatant));
+        System.out.println("----------------------------------");
+        System.out.println("Your Turn: " + combatant.getName());
+        System.out.println(formatCombatantStatus(combatant));
+        System.out.println("----------------------------------");
     }
 
     @Override
     public void printActionResult(ActionResult result) {
-        System.out.println("--------------Action Result--------------");
+        System.out.println();
         System.out.println("-->" + result.getActor().getName() + " used " + result.getActionName() + ".");
+        System.out.println();
+        System.out.println("--------------Action Result------------------");
+        System.out.println();
+        for (String note: result.getNotes()) {
+            System.out.println("  " + note);
+        }
         for (ActionResult.EffectEvent event : result.getEffectEvents()) {
             System.out.printf("  %s gained effect: %s.%n", event.target().getName(), event.effectName());
         }
         for (ActionResult.DamageEvent event : result.getDamageEvents()) {
-            System.out.printf("-->  %s took %d damage (%d -> %d).%n",
+            System.out.printf("-->%s took %d damage (%d -> %d).%n",
                     event.target().getName(),
                     event.appliedDamage(),
                     event.beforeHp(),
@@ -61,9 +71,6 @@ public class ConsoleBattleUI implements BattleUI {
         }
         for (ActionResult.DefeatEvent event : result.getDefeatEvents()) {
             System.out.println("  " + event.target().getName() + " was defeated.");
-        }
-        for (String note : result.getNotes()) {
-            System.out.println("  " + note);
         }
         if (result.getConsumedItem() != null) {
             System.out.printf("  Consumed item: %s (slot %d).%n",
@@ -84,7 +91,7 @@ public class ConsoleBattleUI implements BattleUI {
 
     @Override
     public void printBackupSpawn(List<Enemy> backup) {
-        System.out.println("Backup wave has arrived.");
+        System.out.println("Reinforcements have arrived!");
         for (Enemy enemy : backup) {
             System.out.println("+" + enemy.getName());
         }
