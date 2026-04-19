@@ -10,14 +10,14 @@ package com.sc2002.arena.level;
  */
 public class Level {
  
-    public enum Difficulty { EASY, MEDIUM, HARD, BOSS }
+    public enum Difficulty { EASY, MEDIUM, HARD, BOSS } // Used to represent the different difficulties of the game, which will in the end determine the different enemies the user will face in the battle.
  
     private final Difficulty difficulty;
     private final int levelNumber;
     private final Wave initialWave;
     private final Wave backupWave;
  
-    public Level(int levelNumber, Difficulty difficulty,
+    public Level(int levelNumber, Difficulty difficulty, //Used to initialise the level with the different parameters such as the level number, difficulty, initial wave and backup wave.
                  Wave initialWave, Wave backupWave) {
         this.levelNumber  = levelNumber;
         this.difficulty   = difficulty;
@@ -25,14 +25,14 @@ public class Level {
         this.backupWave   = backupWave;
     }
  
-    public int        getLevelNumber()  { return levelNumber; }
-    public Difficulty getDifficulty()   { return difficulty; }
-    public Wave       getInitialWave()  { return initialWave; }
-    public Wave       getBackupWave()   { return backupWave; }
-    public boolean    hasBackupWave()   { return !backupWave.isEmpty(); }
+    public int        getLevelNumber()  { return levelNumber; }  //used to show the user which level number they are on
+    public Difficulty getDifficulty()   { return difficulty; }  //used to show the user which difficulty they have chosen
+    public Wave       getInitialWave()  { return initialWave; } //used to get the initial wave of enemies that the user will face at the start 
+    public Wave       getBackupWave()   { return backupWave; }  //used to get the backup wave of enemies 
+    public boolean    hasBackupWave()   { return !backupWave.isEmpty(); } //used to check if there is a backup wave of enemies 
  
     @Override
-    public String toString() {
+    public String toString() { //used to return the string representation of the level number and difficulty for the user to see when they are choosing the difficulty of the game.
         return "Level " + levelNumber + " (" + difficulty + ")";
     }
 }

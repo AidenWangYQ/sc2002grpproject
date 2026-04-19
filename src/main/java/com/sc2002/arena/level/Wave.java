@@ -9,7 +9,7 @@ import java.util.List;
  * SRP – holds only the enemy list for one spawn event.
  */
 
-public class Wave {
+public class Wave { //used to represent one wave of enemies.
  
     private final List<Enemy> enemies;
  

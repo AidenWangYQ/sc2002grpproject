@@ -31,7 +31,7 @@ public class LevelFactory {
         };
     }
 
-    private static Level createEasy() {
+    private static Level createEasy() { //the different enemies the user will face for easy initialising the 3 goblins
         Wave initial = new Wave(List.of(
                 new Goblin("Goblin A"),
                 new Goblin("Goblin B"),
@@ -41,7 +41,7 @@ public class LevelFactory {
         return new Level(1, Level.Difficulty.EASY, initial, backup);
     }
 
-    private static Level createMedium() {
+    private static Level createMedium() { //used to initialise the different enemies user will face for medium level
         Wave initial = new Wave(List.of(
                 new Goblin("Goblin"),
                 new Wolf("Wolf")
@@ -53,7 +53,7 @@ public class LevelFactory {
         return new Level(2, Level.Difficulty.MEDIUM, initial, backup);
     }
 
-    private static Level createHard() {
+    private static Level createHard() {  //used to initialise the different enemies user will face in hard
         Wave initial = new Wave(List.of(
                 new Goblin("Goblin A"),
                 new Goblin("Goblin B")
@@ -66,7 +66,7 @@ public class LevelFactory {
         return new Level(3, Level.Difficulty.HARD, initial, backup);
     }
 
-    private static Level createBoss() {
+    private static Level createBoss() {  //used to initalise the boss difficulty enemies
         Wave initial = new Wave(List.of(
                 new Dragon("Ancient Dragon")
         ));
