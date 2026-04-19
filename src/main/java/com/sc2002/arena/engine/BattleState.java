@@ -7,6 +7,24 @@ import com.sc2002.arena.combatant.Combatant;
 import com.sc2002.arena.combatant.Enemy;
 import com.sc2002.arena.combatant.Player;
 
+/**
+ * Holds the complete mutable state of a running battle.
+ *
+ * BattleEngine reads and writes through this object rather than holding
+ * state fields directly, keeping BattleEngine focused on orchestration (SRP).
+ *
+ * Implements BattleContext so that skills and enemy strategies can query
+ * living combatants without gaining access to the mutation methods
+ * (addInitialEnemy, incrementRound, etc.) — those are only visible on
+ * the concrete BattleState type used by BattleEngine and SpawnManager.
+ *
+ * SOLID:
+ *   SRP – sole responsibility is holding and exposing battle state.
+ *   ISP – exposes only getLivingOpponentsOf/getLivingAlliesOf/getRoundNumber
+ *          through the BattleContext interface; mutation methods stay hidden
+ *          from skills and strategies that only need to read state.
+ */
+
 public class BattleState implements com.sc2002.arena.strategy.BattleContext {
     private final List<Player> players = new ArrayList<>();
     private final List<Enemy> allEnemies = new ArrayList<>();

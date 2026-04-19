@@ -11,6 +11,26 @@ import com.sc2002.arena.effect.CriticalEffect;
 import com.sc2002.arena.effect.StatusEffect;
 import com.sc2002.arena.strategy.BattleContext;
 
+/**
+ * Provides low-level combat resolution utilities used by CombatAction implementations.
+ *
+ * ActionResolver handles:
+ *   - Delegating action execution to the CombatAction itself (resolve)
+ *   - Rolling for critical hits and applying the CriticalEffect (prepareAttack)
+ *   - Computing and applying damage to a target (applyDamage)
+ *   - Applying status effects to a target (applyStatus)
+ *
+ * The random source is injectable for testability — tests can inject a fixed
+ * DoubleSupplier to guarantee or suppress critical hits without relying on
+ * actual randomness.
+ *
+ * SOLID:
+ *   SRP – sole responsibility: resolve action execution and compute damage.
+ *   DIP – depends on CombatAction/StatusEffect interfaces, not concrete classes.
+ *   OCP – new action types implement CombatAction and call these helpers;
+ *         ActionResolver itself does not need to change.
+ */
+
 public class ActionResolver {
     private static final DoubleSupplier DEFAULT_RANDOM_SOURCE = Math::random;
 

@@ -15,7 +15,22 @@ import com.sc2002.arena.combatant.SpecialSkillUser;
 import com.sc2002.arena.item.Inventory;
 import com.sc2002.arena.item.PowerStone;
 import com.sc2002.arena.strategy.TurnOrderStrategy;
-
+/**
+ * Responsible for determining turn order and processing each combatant's turn.
+ *
+ * TurnManager sits between BattleEngine (which drives the round loop) and
+ * ActionResolver (which executes the chosen action). It handles:
+ *   - Sorting combatants via the injected TurnOrderStrategy
+ *   - Checking whether a combatant can act (stun check via canAct())
+ *   - Prompting players via UI or delegating to enemy action strategies
+ *   - Building the correct ActionContext for each situation
+ *   - Ticking skill cooldowns after a combatant acts
+ *
+ * SOLID:
+ *   SRP – handles turn sequencing and action dispatch; no damage/effect logic.
+ *   DIP – depends on TurnOrderStrategy interface, not SpeedBasedTurnOrderStrategy.
+ *   OCP – new action types or combatant types extend without modifying this class.
+ */
 public class TurnManager {
     private final TurnOrderStrategy strategy;
     private final ActionResolver actionResolver;
