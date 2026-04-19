@@ -240,7 +240,9 @@ mvn clean compile
 ```bash
 mvn exec:java
 ```
+
 ---
+
 ### 🔁 Alternative: Run without Maven (Fallback)
 
 If Maven execution does not work, you can run the program manually:
@@ -256,46 +258,6 @@ mvn clean compile
 ```bash
 java -cp target/classes com.sc2002.arena.Main
 ```
-
----
-
-### 🧪 Run Tests
-
-```bash
-mvn test
-```
-
----
-
-#### 🔁 Alternative: Run Tests without Maven
-
-If Maven is unavailable, tests can be run manually.
-
-##### Step 1: Compile source and test files
-
-```bash
-javac -d out $(find src/main/java -name "*.java") $(find src/test/java -name "*.java")
-```
-
-##### Step 2: Run test class
-
-```bash
-java -cp "out:PATH_TO_JUNIT_JAR" junit.textui.TestRunner com.sc2002.arena.AppTest
-```
-
----
-
-### ⚠️ Notes for Manual Testing
-
-- You must download the JUnit 3.8.1 JAR manually  
-- Replace `PATH_TO_JUNIT_JAR` with the actual path to the JUnit `.jar` file  
-- On Windows, use `;` instead of `:` in the classpath:
-
-```bash
-java -cp "out;PATH_TO_JUNIT_JAR" junit.textui.TestRunner com.sc2002.arena.AppTest
-```
-
-- This method is more error-prone; using Maven is strongly recommended
 
 ---
 
