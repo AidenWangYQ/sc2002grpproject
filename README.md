@@ -298,12 +298,6 @@ NTU AY25/26 Semester 2
 
 ---
 
-## 🔗 Repository
-
-https://github.com/AidenWangYQ/sc2002grpproject
-
----
-
 ## 📎 Notes
 
 This project focuses on **software design quality**, not UI complexity.  
