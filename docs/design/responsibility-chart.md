@@ -1,61 +1,50 @@
-# Responsibility Chart (v1)
+# Responsibility Chart
 
-| Class / Abstraction | Responsibility | Why it exists / Design rationale |
+| Class / Abstraction | Responsibility | Design Rationale |
 |---|---|---|
-| `ConsoleUI` | Handles CLI display and user interaction | Separates boundary concerns from control and domain logic |
-| `MenuRenderer` | Renders menus and battle information | Keeps presentation logic out of controller flow |
-| `InputHandler` | Reads and validates console input | Prevents input parsing from spreading across UI classes |
-| `GameController` | Coordinates game setup and communication between UI and engine | Acts as the main control layer between boundary and domain |
-| `BattleEngine` | Manages battle rounds, turn processing, win/loss checks, and backup spawn triggering | Central control component for battle flow |
-| `BattleContext` | Stores shared battle state used by engine, actions, items, and effects | Reduces tight coupling between mechanics and the engine internals |
-| `Combatant` | Common abstraction for all battle participants | Supports LSP and polymorphic handling in turn order and battle flow |
-| `AbstractCombatant` | Provides shared combatant state and behaviour | Avoids duplication across players and enemies |
-| `Player` | Represents a user-controlled combatant | Encapsulates player-specific behaviour such as inventory access |
-| `Enemy` | Represents a non-player combatant | Encapsulates enemy-specific behaviour such as deciding its action |
-| `Warrior` | Concrete player class with Shield Bash | Encodes Warrior-specific special skill |
-| `Wizard` | Concrete player class with Arcane Blast and temporary attack scaling | Encodes Wizard-specific special skill and buff behaviour |
-| `Goblin` | Concrete enemy type | Encodes Goblin stats |
-| `Wolf` | Concrete enemy type | Encodes Wolf stats |
-| `Stats` | Stores base combat attributes such as max HP, attack, defense, and speed | Encapsulates combat statistics cleanly |
-| `Action` | Abstraction for a turn action | Supports OCP by allowing new actions to be added cleanly |
-| `BasicAttackAction` | Handles standard attack behaviour against one target | Isolates normal damage logic |
-| `DefendAction` | Applies a temporary defend effect to the actor | Encapsulates defend behaviour |
-| `UseItemAction` | Uses an item during a turn | Decouples item usage from engine logic |
-| `SpecialSkillAction` | Base abstraction for special skills | Groups player-class-specific skills under a common abstraction |
-| `ShieldBashAction` | Warrior special skill that damages and stuns one target | Isolates Warrior-specific skill logic |
-| `ArcaneBlastAction` | Wizard special skill that damages all enemies and may grant attack buffs | Isolates Wizard-specific skill logic |
-| `StatusEffect` | Abstraction for persistent buffs/debuffs | Supports extensible turn-based effect logic |
-| `StunEffect` | Prevents a target from acting for a limited duration | Models stun logic cleanly |
-| `DefendEffect` | Temporarily boosts defense | Models defend bonus duration and effect |
-| `SmokeBombEffect` | Causes enemy attacks to deal 0 damage for a duration | Models smoke bomb protection behaviour |
-| `ArcaneBlastBuff` | Represents attack bonus granted by Arcane Blast kills | Encapsulates Wizard-specific buff logic |
-| `Item` | Abstraction for usable items | Supports multiple item types without changing engine logic |
-| `Potion` | Restores HP up to max HP | Isolates healing item behaviour |
-| `PowerStone` | Triggers a free special skill without changing cooldown | Isolates special skill override behaviour |
-| `SmokeBomb` | Applies smoke bomb protection effect | Isolates smoke bomb item behaviour |
-| `Inventory` | Stores and manages player items | Encapsulates item collection operations |
-| `TurnOrderStrategy` | Determines the order of combatants each round | Supports extensibility for future turn-order rules |
-| `SpeedBasedTurnOrderStrategy` | Implements speed-based turn order | Satisfies the assignment’s current rule |
-| `Level` | Represents a difficulty setup with waves | Encapsulates level configuration |
-| `Wave` | Represents a group of enemies spawned together | Encapsulates wave-level enemy management |
-| `SpawnManager` | Handles initial and backup spawning | Keeps spawning logic separate from battle loop logic |
-| `LevelFactory` | Creates predefined Easy / Medium / Hard levels | Centralizes level creation and improves maintainability |
-docs/design/architecture-rules.md
-# Architecture Rules (v1)
-
-## 1. Layer separation
-- UI classes in the `ui` package must only handle user input, display, and interaction flow.
-- UI classes must not contain battle logic, damage calculations, cooldown handling, or status-effect logic.
-- Control classes coordinate flow but should not contain presentation logic.
-
-## 2. Battle engine responsibility
-- `BattleEngine` is responsible for orchestrating battle rounds, turn progression, win/loss checks, and backup spawn triggering.
-- `BattleEngine` must not hardcode the detailed logic of every action, item, or status effect.
-- New mechanics should integrate via abstractions instead of large `if-else` branches in the engine.
-
-## 3. Combatant design
-- All battle participants must be handled through the `Combatant` abstraction where possible.
-- `Player` and `Enemy` must remain substitutable as `Combatant`.
-- Shared combatant logic should stay in `AbstractCombatant` to reduce duplication.
-
-## 4. Action design
+| `BattleUI` | Defines interface for all UI interactions | Decouples UI from core logic (DIP) |
+| `ConsoleBattleUI` | Handles CLI display and user interaction | Concrete UI implementation |
+| `GameController` | Coordinates game setup and system initialisation | Acts as entry point and orchestrator |
+| `BattleEngine` | Manages battle lifecycle (rounds, win/loss, spawning) | Central control component for battle flow |
+| `TurnManager` | Determines turn order and executes actions per turn | Separates turn logic from engine (SRP) |
+| `ActionResolver` | Handles combat resolution (damage, effects) | Centralises combat logic for consistency |
+| `BattleState` | Stores current battle state (players, enemies, rounds) | Provides shared context across system |
+| `Combatant` | Base abstraction for all battle participants | Enables polymorphism (LSP) |
+| `Player` | Represents user-controlled combatant | Encapsulates inventory and skill logic |
+| `Enemy` | Represents AI-controlled combatant | Delegates behaviour to strategy (OCP) |
+| `Warrior` | Player class with Shield Bash skill | Encodes Warrior-specific configuration |
+| `Wizard` | Player class with Arcane Blast skill | Encodes Wizard-specific behaviour |
+| `Goblin` | Basic enemy type | Defines simple enemy stats |
+| `Wolf` | Fast attack-oriented enemy | Defines alternative enemy stats |
+| `Dragon` | Boss enemy with special skill | Demonstrates advanced enemy behaviour |
+| `CombatAction` | Abstraction for all turn actions | Enables polymorphic execution (OCP) |
+| `BasicAttackAction` | Executes standard attack | Encapsulates damage logic |
+| `DefendAction` | Applies defensive effect | Encapsulates defence behaviour |
+| `UseItemAction` | Executes item usage | Decouples item logic from engine |
+| `UseSpecialSkillAction` | Executes skill usage | Integrates skill system into action flow |
+| `ActionContext` | Carries data required for action execution | Reduces parameter coupling |
+| `ActionResult` | Stores results of an action | Enables consistent output handling |
+| `Item` | Abstraction for all usable items | Supports extensibility (OCP) |
+| `Inventory` | Manages item storage and usage | Encapsulates item lifecycle |
+| `HealPotion` | Restores HP | Encapsulates healing logic |
+| `PowerStone` | Triggers skill without cooldown | Extends skill interaction |
+| `SmokeBomb` | Applies temporary protection effect | Encapsulates defensive utility |
+| `StatusEffect` | Base abstraction for effects | Enables extensible buff/debuff system |
+| `StatusEffectManager` | Manages effect lifecycle | Centralises effect handling (SRP) |
+| `StunEffect` | Prevents actions for duration | Encodes stun logic |
+| `DefendEffect` | Reduces incoming damage | Encodes defensive buff |
+| `RageEffect` | Increases critical chance | Encodes offensive buff |
+| `SpecialSkill` | Abstraction for skills | Supports multiple skill types |
+| `SpecialSkillUser` | Marks entities capable of using skills | Demonstrates ISP |
+| `ShieldBashSkill` | Warrior skill (damage + stun) | Encapsulates Warrior behaviour |
+| `ArcaneBlastSkill` | Wizard skill (AOE + buff) | Encapsulates Wizard behaviour |
+| `DragonBreathSkill` | Dragon skill (high damage effect) | Encapsulates boss behaviour |
+| `EnemyActionStrategy` | Determines enemy action logic | Enables extensible AI (Strategy pattern) |
+| `BasicAttackEnemyActionStrategy` | Simple enemy AI | Default enemy behaviour |
+| `DragonEnemyActionStrategy` | Boss enemy AI | More complex decision logic |
+| `TurnOrderStrategy` | Determines turn order | Supports extensibility (OCP) |
+| `SpeedBasedTurnOrderStrategy` | Orders by speed | Current rule implementation |
+| `Level` | Represents game difficulty setup | Encapsulates configuration |
+| `Wave` | Represents group of enemies | Supports multi-wave design |
+| `SpawnManager` | Handles enemy spawning | Separates spawning from engine |
+| `LevelFactory` | Creates predefined levels | Centralises configuration logic |

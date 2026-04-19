@@ -1,48 +1,106 @@
-# Architecture Rules (v1)
+# Architecture Rules 
 
-## 1. Layer separation
-- UI classes in the `ui` package must only handle user input, display, and interaction flow.
-- UI classes must not contain battle logic, damage calculations, cooldown handling, or status-effect logic.
-- Control classes coordinate flow but should not contain presentation logic.
+## 1. Layer Separation
+- UI classes (`BattleUI`, `ConsoleBattleUI`) must only handle user input and output.
+- UI must not contain battle logic, damage calculations, or status-effect handling.
+- Control components coordinate system flow but must not include presentation logic.
 
-## 2. Battle engine responsibility
-- `BattleEngine` is responsible for orchestrating battle rounds, turn progression, win/loss checks, and backup spawn triggering.
-- `BattleEngine` must not hardcode the detailed logic of every action, item, or status effect.
-- New mechanics should integrate via abstractions instead of large `if-else` branches in the engine.
+---
 
-## 3. Combatant design
-- All battle participants must be handled through the `Combatant` abstraction where possible.
-- `Player` and `Enemy` must remain substitutable as `Combatant`.
-- Shared combatant logic should stay in `AbstractCombatant` to reduce duplication.
+## 2. Battle Engine Responsibility
+- `BattleEngine` orchestrates the overall battle lifecycle:
+  - round progression
+  - win/loss conditions
+  - integration of turn and spawn systems
+- `BattleEngine` must not implement detailed combat logic.
+- All combat behaviour must be delegated to abstractions (e.g., `CombatAction`, `ActionResolver`).
 
-## 4. Action design
-- Every turn action must implement `Action`.
-- `BattleEngine` should execute actions polymorphically through the `Action` abstraction.
-- New actions should be addable without changing the main battle loop.
+---
 
-## 5. Status effect design
-- Persistent effects must implement `StatusEffect`.
-- Duration and turn-based behaviour should remain inside effect classes.
-- Effect logic should not be scattered across engine and combatant classes.
+## 3. Turn Management
+- `TurnManager` is responsible for:
+  - determining turn order
+  - executing actions per turn
+- Turn ordering must be delegated to `TurnOrderStrategy`.
+- New turn ordering rules must be addable without modifying `TurnManager`.
 
-## 6. Item design
+---
+
+## 4. Combatant Design
+- All battle participants must be treated as `Combatant`.
+- `Player` and `Enemy` must remain substitutable under `Combatant` (LSP).
+- Combat-related state (HP, attack, defense, effects) must be encapsulated within `Combatant`.
+- Status-effect logic must not be embedded directly in `Combatant`.
+
+---
+
+## 5. Action Design
+- All actions must implement the `CombatAction` interface.
+- Actions must encapsulate their own execution behaviour.
+- `TurnManager` must execute actions polymorphically via `CombatAction`.
+- New actions must be addable without modifying existing control logic (OCP).
+
+---
+
+## 6. Action Resolution
+- All combat calculations must be handled by `ActionResolver`.
+- This includes:
+  - damage calculation
+  - effect application
+- Combat logic must not be duplicated across action classes.
+
+---
+
+## 7. Status Effect Design
+- All effects must extend the `StatusEffect` abstraction.
+- Effect lifecycle (duration, triggers) must be managed by `StatusEffectManager`.
+- Effects must modify behaviour through polymorphic hooks (e.g., damage modifiers).
+- Effect logic must not be scattered across engine or combatant classes.
+
+---
+
+## 8. Skill System Design
+- Skills must implement the `SpecialSkill` interface.
+- Only entities capable of using skills should implement `SpecialSkillUser` (ISP).
+- Cooldown logic must remain within the skill-user abstraction.
+
+---
+
+## 9. Enemy Behaviour Design
+- Enemy decision-making must be delegated to `EnemyActionStrategy`.
+- `Enemy` must not contain hardcoded behaviour logic.
+- New enemy behaviours must be implemented via new strategy classes (OCP).
+
+---
+
+## 10. Item Design
 - All items must implement the `Item` abstraction.
-- Item-specific behaviour must remain in concrete item classes.
-- The engine should not directly implement Potion, Power Stone, or Smoke Bomb logic.
+- Item behaviour must be encapsulated within concrete item classes.
+- Inventory management must be handled by the `Inventory` class.
+- The engine must not directly implement item-specific logic.
 
-## 7. Turn order design
-- Turn order must be determined through `TurnOrderStrategy`.
-- The current implementation uses speed-based ordering, but alternative strategies should be addable later without changing `BattleEngine`.
+---
 
-## 8. Level and spawning
-- Level setup should be created through `LevelFactory`.
-- Initial wave and backup wave logic should be separated from the main battle loop where possible.
+## 11. Level and Spawning
+- Level configuration must be created through `LevelFactory`.
+- Runtime spawning logic must be handled by `SpawnManager`.
+- Enemy wave logic must remain separate from the battle loop.
 
-## 9. Documentation consistency
-- UML diagrams must reflect the actual implementation.
-- If code structure changes significantly, the class diagram, sequence diagram, and design notes must be updated.
+---
 
-## 10. Git discipline
-- No direct commits to `main`.
-- All feature branches branch from `dev`.
-- Team members should work mainly within their assigned packages/files to reduce merge conflicts.
+## 12. Documentation Consistency
+- UML diagrams must accurately reflect the implemented system.
+- Any architectural changes must be reflected in:
+  - class diagrams
+  - sequence diagrams
+  - design documentation
+
+---
+
+## 13. Design Principles Enforcement
+- The system must adhere to SOLID principles:
+  - **SRP**: Each class has a single responsibility
+  - **OCP**: New features added via extension, not modification
+  - **LSP**: Subclasses must be substitutable for base classes
+  - **ISP**: Interfaces must remain focused and minimal
+  - **DIP**: High-level modules depend on abstractions

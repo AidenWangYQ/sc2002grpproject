@@ -1,193 +1,232 @@
-# SC2002 Object-Oriented Design Project  
-## Turn-Based Battle Arena System  
+# 🛡️ SC2002 Turn-Based Combat Arena
+
+A modular, extensible turn-based combat system built in Java, designed using **Object-Oriented Design Principles (OODP)** and **SOLID principles**.
 
 ---
 
-## 📌 Overview  
+## 📌 Overview
 
-This project implements a modular **turn-based battle arena system** using object-oriented design principles. The system simulates combat between a player-controlled character and AI-driven enemies with configurable behaviours.
+This project implements a command-line turn-based battle game where a player-controlled character fights AI-controlled enemies using:
 
-The architecture is designed with strong emphasis on:
-- **Extensibility** – new actions, effects, and enemy behaviours can be added easily  
-- **Maintainability** – clear separation of responsibilities across components  
-- **Scalability** – supports future expansion with minimal code changes  
+- ⚔️ Combat Actions (Attack, Defend, Item, Skill)
+- 🧪 Items & Inventory System
+- ✨ Status Effects (Stun, Buffs, Invulnerability)
+- 🔥 Special Skills with Cooldowns
+- 🧠 Extensible Enemy Behaviour (Strategy Pattern)
+- 🌊 Multi-wave Level System
 
----
-
-## 🎯 Objectives  
-
-- Apply **Object-Oriented Programming (OOP)** concepts in a complete system  
-- Design a **flexible and scalable combat engine**  
-- Demonstrate usage of **software design patterns**  
-- Ensure **high cohesion and low coupling** across modules  
+The system is designed with a strong focus on **modularity, extensibility, and clean architecture**.
 
 ---
 
-## 🧱 Project Structure  
+## 🏗️ Architecture
 
-### Packages  
+The system follows a **layered Boundary–Control–Entity (BCE)** architecture:
 
-- **action/**  
-  Handles all action-related logic (attack, defend, skills, item usage).  
-  Each action is encapsulated as a class for modularity.  
+### 🔹 Boundary (UI Layer)
+- `BattleUI` (interface)
+- `ConsoleBattleUI`
 
-- **combatant/**  
-  Defines core entities such as `Player`, `Enemy`, and base combatant logic.  
-
-- **common/**  
-  Contains shared utilities such as `DamageCalculator` and constants.  
-
-- **controller/**  
-  Acts as the intermediary between UI and engine, coordinating interactions.  
-
-- **engine/**  
-  Core battle logic including `BattleEngine`, `TurnManager`, and effect processing.  
-
-- **level/**  
-  Manages game progression, including levels, waves, and enemy spawning.  
-
-- **strategy/**  
-  Implements AI decision-making and turn-order strategies using the Strategy Pattern.  
-
-- **Main.java**  
-  Entry point of the application.  
+👉 Handles all user interaction  
+👉 Fully decoupled from core logic (**DIP**)
 
 ---
 
-## ⚔️ Core Features  
+### 🔹 Control (Engine Layer)
+- `GameController` → setup + orchestration
+- `BattleEngine` → battle lifecycle
+- `TurnManager` → turn order + flow
+- `ActionResolver` → damage & effect resolution
+- `SpawnManager` → enemy spawning
 
-### Turn-Based Combat System  
-- Alternating turns between player and enemy  
-- Turn order determined using strategy-based logic  
-
-### Action System  
-- Supports multiple action types:  
-  - Basic Attack  
-  - Defend  
-  - Skills (e.g., Shield Bash)  
-  - Item Usage (e.g., Potion)  
-- Each action is encapsulated as a class (**Command Pattern**)  
-
-### Status Effects  
-- Includes effects such as:  
-  - Defense buffs  
-  - Stun effects  
-- Effects persist across turns and are centrally managed  
-
-### Enemy AI  
-- Enemy decisions handled through strategy classes  
-- Enables flexible and extendable AI behaviour  
-
-### Level & Wave System  
-- Structured gameplay progression via:  
-  - Levels  
-  - Enemy waves  
-  - Spawn management  
+👉 Clear separation of responsibilities (**SRP**)  
+👉 Centralised combat resolution for consistency
 
 ---
 
-## 🧠 Design Overview  
+### 🔹 Entity (Domain Layer)
+- `Combatant` (abstract)
+- `Player`, `Enemy`
+- `Item`, `SpecialSkill`, `StatusEffect`
 
-### Separation of Concerns  
-
-- **UI Layer** → Handles user interaction  
-- **Controller Layer** → Coordinates system flow  
-- **Engine Layer** → Processes battle logic  
-- **Domain Layer** → Represents entities (combatants, actions, effects)  
-
-This layered architecture improves readability and maintainability.
+👉 Core game logic and state  
+👉 Supports polymorphic behaviour (**LSP, OCP**)
 
 ---
 
-## 🧩 Design Patterns Used  
+## 🎮 Key Features
 
-### Strategy Pattern  
-Used for:
-- Enemy action selection  
-- Turn order determination  
+### ⚔️ Combat System
+- Turn-based gameplay using `TurnOrderStrategy`
+- Damage formula:
 
-Allows dynamic swapping of behaviours without modifying core logic.  
-
----
-
-### Command Pattern (Action-Based Design)  
-- Each action is encapsulated as an object  
-- Supports easy addition of new actions without modifying existing code  
+```text
+max(0, Attack - Defense)
+```
 
 ---
 
-### Manager-Based Design  
-Used in:
-- Turn management  
-- Effect handling  
-- Cooldown tracking  
+### 🧠 Strategy Pattern (Extensibility)
+- `EnemyActionStrategy`
+- `TurnOrderStrategy`
 
-Improves modularity by isolating responsibilities into dedicated components.  
+👉 New behaviours can be added **without modifying existing code** (**OCP**)
 
 ---
 
-## 🔄 System Flow (Simplified)  
+### ✨ Status Effect System
+- `StatusEffect` abstraction
+- Managed via `StatusEffectManager`
 
-1. Player selects an action via the UI  
-2. Controller forwards action to the battle engine  
-3. Engine processes the action  
-4. Damage and effects are applied  
-5. Turn transitions to next entity  
-6. Loop continues until battle ends  
+Examples:
+- Stun → skip turns
+- Defend → reduce incoming damage
+- Smoke Bomb → temporary invulnerability
 
----
-
-## 🧪 Testing  
-
-Testing focuses on validating both core gameplay mechanics and edge cases, including:
-
-- Damage calculations and defense interactions  
-- Status effects (e.g., stun preventing actions)  
-- Action execution correctness  
-- Item usage and consumption  
-- Turn handling and invalid scenarios  
-
-These tests ensure system reliability under different conditions.
+👉 Decoupled effect lifecycle (**SRP + OCP**)
 
 ---
 
-## 📊 UML & Documentation  
-
-The project includes:
-- UML Class Diagram  
-- UML Sequence Diagram  
-- Supporting documentation  
-
-These artifacts illustrate system structure and runtime interactions.
+### 🔥 Skill System
+- `SpecialSkill` interface
+- Cooldown-based execution
+- Implemented only by capable entities via `SpecialSkillUser` (**ISP**)
 
 ---
 
-## ▶️ How to Run  
+### 🎒 Item & Inventory System
+- `Item` abstraction
+- `Inventory` manages usage + consumption
 
-Run the application using:
-Main.java
-
-in your IDE.  
-
-This starts the battle simulation via the console interface.
-
----
-
-## 🚀 Future Improvements  
-
-- Graphical User Interface (GUI) implementation  
-- Additional enemy types and behaviours  
-- Expanded skill and effect systems  
-- More advanced battle mechanics  
+Examples:
+- Potion → heal
+- Power Stone → free skill usage
+- Smoke Bomb → negate damage
 
 ---
 
-## 👥 Team Members  
+### 🌊 Level & Wave System
+- `Level` + `LevelFactory`
+- `SpawnManager` handles runtime spawning
 
-- Aiden Wang Yugi  
-- Elliot Heng Zheng Yang  
-- Ng Yan En  
-- Ramachandran Saichandar  
-- Sooraj Senthil  
+👉 Supports:
+- Multiple difficulty levels
+- Backup enemy waves
 
 ---
+
+## 🧩 UML Diagrams
+
+### 📊 Class Diagrams
+- System Overview
+- Core Architecture
+- Extensibility Mechanisms
+
+👉 Show:
+- Layered design
+- Inheritance hierarchy
+- Strategy + abstraction usage
+
+---
+
+### 🔄 Sequence Diagram
+
+Models required scenario:
+
+1. Enemy attacks
+2. Player defends
+3. Reduced damage
+4. Skill (Stun)
+5. Enemy skips turn
+6. Player uses item
+7. Enemy skips again
+8. Final attack
+
+👉 Demonstrates full interaction between:
+- UI → Control → Entity layers
+
+---
+
+## 🧠 SOLID Principles Applied
+
+| Principle | Implementation |
+|----------|---------------|
+| **SRP** | TurnManager, ActionResolver, StatusEffectManager |
+| **OCP** | Actions, Items, Skills, Effects via interfaces |
+| **LSP** | Player & Enemy interchangeable as Combatant |
+| **ISP** | `SpecialSkillUser` avoids bloated interfaces |
+| **DIP** | Engine depends on abstractions (UI, strategies) |
+
+---
+
+## ⚖️ Design Trade-offs
+
+### ✅ Strategy Pattern vs Hardcoding
+✔ Extensible  
+❌ More classes
+
+### ✅ Centralised ActionResolver
+✔ Consistent logic  
+❌ Strong dependency on one component
+
+### ✅ StatusEffectManager
+✔ Clean separation  
+❌ Slight complexity overhead
+
+---
+
+## 🧪 Testing
+
+Edge cases tested:
+
+- HP boundary (no negative values)
+- Potion cap (no overheal)
+- Stun duration correctness
+- Smoke Bomb duration
+- Skill cooldown logic
+- Backup spawning behaviour
+
+---
+
+## ⚠️ Limitations
+
+- CLI-based UI (no GUI)
+- Simple enemy AI (basic attack only)
+- No save/load system
+- Limited game content
+
+---
+
+## 🚀 Future Improvements
+
+- GUI implementation
+- Advanced AI strategies
+- More characters / skills / effects
+- Save & load system
+- Game balancing enhancements
+
+---
+
+## 👨‍💻 Authors
+
+SC2002 Object-Oriented Design & Programming  
+NTU AY25/26 Semester 2
+
+- Aiden Wang Yuqi
+- Ng Yan En
+- Ramachandran Saichandar
+- Sooraj Senthil
+- Elliot Heng Zheng Yang
+
+---
+
+## 🔗 Repository
+
+*(Insert your GitHub link here)*
+
+---
+
+## 📎 Notes
+
+This project focuses on **software design quality**, not UI complexity.  
+All features are implemented to demonstrate **OOD + SOLID principles** clearly.
