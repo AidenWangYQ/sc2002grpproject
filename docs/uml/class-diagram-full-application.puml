@@ -1,0 +1,483 @@
+@startuml FullApplicationClassDiagram
+left to right direction
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+package "UI Layer" {
+    interface BattleUI {
+        + printMessage(message: String)
+        + printRoundHeader(roundNumber: int)
+        + printTurnHeader(combatant: Combatant)
+        + printActionResult(result: ActionResult)
+        + printCannotAct(combatant: Combatant)
+        + printBackupSpawn(backup: List<Enemy>)
+        + printRoundSummary(context: BattleState)
+        + printVictoryScreen(context: BattleState)
+        + printDefeatScreen(context: BattleState)
+        + promptPlayerAction(player: Player, availableActions: List<CombatAction>, livingEnemies: List<Enemy>): CombatAction
+        + promptTargetSelection(livingEnemies: List<Enemy>): Enemy
+        + promptItemSlotSelection(player: Player, availableSlots: List<InventorySlot>): int
+    }
+
+    class ConsoleBattleUI {
+        - scanner: Scanner
+    }
+
+    class GameController {
+        - scanner: Scanner
+        - ui: ConsoleBattleUI
+        + run()
+    }
+}
+
+package "Engine Layer" {
+    class BattleEngine {
+        - context: BattleState
+        - turnManager: TurnManager
+        - spawnManager: SpawnManager
+        - ui: BattleUI
+        + initialize()
+        + runBattle(): BattleOutcome
+        + checkVictoryConditions(): BattleOutcome
+    }
+
+    class TurnManager {
+        - strategy: TurnOrderStrategy
+        - actionResolver: ActionResolver
+        - ui: BattleUI
+        + generateTurnOrder(context: BattleState): List<Combatant>
+        + processTurn(current: Combatant, context: BattleState): TurnResolution
+    }
+
+    class ActionResolver {
+        + resolve(action: CombatAction, context: ActionContext): ActionResult
+        + prepareAttack(attacker: Combatant, context: BattleContext, result: ActionResult): PreparedAttack
+        + prepareGuaranteedCriticalAttack(attacker: Combatant, context: BattleContext, result: ActionResult, criticalEffect: StatusEffect, effectName: String, note: String): PreparedAttack
+        + applyDamage(attacker: Combatant, target: Combatant, attackValue: int, context: BattleContext): DamageResolution
+        + applyStatus(effect: StatusEffect, target: Combatant, context: BattleContext)
+    }
+
+    class BattleState {
+        - players: List<Player>
+        - allEnemies: List<Enemy>
+        - activeEnemies: List<Enemy>
+        - roundNumber: int
+        - backupSpawned: boolean
+        + getPlayer(): Player
+        + getLivingPlayers(): List<Player>
+        + addInitialEnemy(enemy: Enemy)
+        + addBackupEnemies(backup: List<Enemy>)
+        + getLivingEnemies(): List<Enemy>
+        + getLivingCombatants(): List<Combatant>
+        + allActiveEnemiesDefeated(): boolean
+        + incrementRound()
+        + getRoundNumber(): int
+        + isBackupSpawned(): boolean
+        + getTotalEnemiesDefeated(): int
+        + getRemainingEnemyCount(): int
+        + getLivingOpponentsOf(actor: Combatant): List<Combatant>
+        + getLivingAlliesOf(actor: Combatant): List<Combatant>
+    }
+
+    class EffectManager {
+        + applyEffectsOnTurnStart(combatant: Combatant, context: BattleState)
+        + applyEffectsOnRoundEnd(combatant: Combatant, context: BattleState)
+    }
+
+    class TurnResolution
+    enum BattleOutcome {
+        ONGOING
+        VICTORY
+        DEFEAT
+    }
+}
+
+package "Strategy Layer" {
+    interface TurnOrderStrategy {
+        + getOrder(combatants: List<Combatant>): List<Combatant>
+    }
+
+    class SpeedBasedTurnOrderStrategy
+
+    interface EnemyActionStrategy {
+        + selectAction(enemy: Enemy, context: BattleContext): CombatAction
+        + selectTarget(enemy: Enemy, context: BattleContext): Combatant
+    }
+
+    class BasicAttackEnemyActionStrategy
+    class DragonEnemyActionStrategy
+
+    interface BattleContext {
+        + getLivingOpponentsOf(actor: Combatant): List<Combatant>
+        + getLivingAlliesOf(actor: Combatant): List<Combatant>
+        + getRoundNumber(): int
+    }
+}
+
+package "Domain Layer" {
+    abstract class Combatant {
+        - name: String
+        - maxHp: int
+        - baseAttack: int
+        - baseDefense: int
+        - speed: int
+        - currentHp: int
+        - statusEffectManager: StatusEffectManager
+        + getName(): String
+        + getMaxHp(): int
+        + getCurrentHp(): int
+        + getBaseAttack(): int
+        + getBaseDefense(): int
+        + getSpeed(): int
+        + getEffectiveAttack(context: BattleContext): int
+        + getEffectiveDefense(context: BattleContext): int
+        + getCriticalChance(context: BattleContext): double
+        + isAlive(): boolean
+        + canAct(): boolean
+        + heal(amount: int): int
+        + receiveDamage(rawDamage: int, attacker: Combatant, context: BattleContext): int
+        + applyEffect(effect: StatusEffect, context: BattleContext)
+        + getActiveEffects(): List<StatusEffect>
+        + clearStatusEffects()
+        + onTurnStart(context: BattleContext)
+        + onTurnEnd(context: BattleContext)
+        + onRoundEnd(context: BattleContext)
+        + removeExpiredEffects()
+    }
+
+    abstract class Player {
+        - inventory: Inventory
+        - specialSkill: SpecialSkill
+        - specialSkillCooldown: int
+        + getInventory(): Inventory
+        + getSpecialSkill(): SpecialSkill
+        + getSpecialSkillCooldown(): int
+        + setSpecialSkillCooldown(cooldown: int)
+        + getSpecialSkillCooldownDuration(): int
+        + tickSpecialSkillCooldown()
+        + getAvailableActions(): List<CombatAction>
+    }
+
+    abstract class Enemy {
+        - actionStrategy: EnemyActionStrategy
+        + getActionStrategy(): EnemyActionStrategy
+        + chooseAction(context: BattleContext): CombatAction
+        + chooseTarget(context: BattleContext): Combatant
+    }
+
+    interface SpecialSkillUser {
+        + getSpecialSkill(): SpecialSkill
+        + getSpecialSkillCooldown(): int
+        + setSpecialSkillCooldown(cooldown: int)
+        + getSpecialSkillCooldownDuration(): int
+        + tickSpecialSkillCooldown()
+    }
+
+    class Warrior
+    class Wizard
+    class Goblin
+    class Wolf
+    class Dragon
+}
+
+package "Action Layer" {
+    interface CombatAction {
+        + getName(): String
+        + requiresTarget(): boolean
+        + execute(context: ActionContext): ActionResult
+    }
+
+    class BasicAttackAction
+    class DefendAction
+    class UseItemAction
+    class UseSpecialSkillAction
+
+    class ActionContext {
+        - actor: Combatant
+        - target: Combatant
+        - itemSlot: Integer
+        - battleContext: BattleContext
+        - actionResolver: ActionResolver
+        + forTargetedAction(actor: Combatant, target: Combatant, battleContext: BattleContext, actionResolver: ActionResolver): ActionContext
+        + forUntargetedAction(actor: Combatant, battleContext: BattleContext, actionResolver: ActionResolver): ActionContext
+        + forItemAction(actor: Combatant, target: Combatant, itemSlot: int, battleContext: BattleContext, actionResolver: ActionResolver): ActionContext
+        + getActor(): Combatant
+        + getTarget(): Combatant
+        + getRequiredTarget(): Combatant
+        + getItemSlot(): Integer
+        + getRequiredItemSlot(): int
+        + getBattleContext(): BattleContext
+        + getActionResolver(): ActionResolver
+    }
+
+    class ActionResult {
+        - actor: Combatant
+        - actionName: String
+        + forAction(actor: Combatant, actionName: String): ActionResult
+        + recordDamage(attacker: Combatant, target: Combatant, beforeHp: int, calculatedDamage: int, appliedDamage: int, afterHp: int)
+        + recordHeal(target: Combatant, beforeHp: int, amount: int, afterHp: int)
+        + recordEffect(target: Combatant, effectName: String)
+        + recordDefeat(target: Combatant)
+        + recordNote(note: String)
+        + recordConsumedItem(itemName: String, slotIndex: int)
+        + recordCooldownChange(before: int, after: int)
+        + merge(other: ActionResult)
+    }
+}
+
+package "Item Layer" {
+    interface Item {
+        + getName(): String
+        + use(context: ActionContext): ActionResult
+    }
+
+    class Inventory {
+        - slots: List<SlotState>
+        + getSlots(): List<InventorySlot>
+        + getUsableItems(): List<Item>
+        + hasUsableItems(): boolean
+        + useItem(slotIndex: int, context: ActionContext): ActionResult
+    }
+
+    class HealPotion
+    class PowerStone
+    class RagePotion
+    class SmokeBomb
+}
+
+package "Effect Layer" {
+    abstract class StatusEffect {
+        - name: String
+        + getName(): String
+        + onApply(target: Combatant, context: BattleContext)
+        + onTurnStart(target: Combatant, context: BattleContext)
+        + onTurnEnd(target: Combatant, context: BattleContext)
+        + onRoundEnd(target: Combatant, context: BattleContext)
+        + modifyCriticalChance(target: Combatant, criticalChance: double, context: BattleContext): double
+        + modifyIncomingDamage(target: Combatant, attacker: Combatant, damage: int, context: BattleContext): int
+        + modifyAttack(target: Combatant, attack: int, context: BattleContext): int
+        + modifyDefense(target: Combatant, defense: int, context: BattleContext): int
+        + preventsAction(): boolean
+        + isExpired(): boolean
+    }
+
+    class StatusEffectManager {
+        - activeEffects: List<StatusEffect>
+        + addEffect(effect: StatusEffect, target: Combatant, context: BattleContext)
+        + getActiveEffects(): List<StatusEffect>
+        + modifyIncomingDamage(target: Combatant, attacker: Combatant, damage: int, context: BattleContext): int
+        + modifyCriticalChance(target: Combatant, criticalChance: double, context: BattleContext): double
+        + modifyAttack(target: Combatant, attack: int, context: BattleContext): int
+        + modifyDefense(target: Combatant, defense: int, context: BattleContext): int
+        + preventsAction(): boolean
+        + onTurnStart(target: Combatant, context: BattleContext)
+        + onTurnEnd(target: Combatant, context: BattleContext)
+        + onRoundEnd(target: Combatant, context: BattleContext)
+        + clear()
+        + removeExpiredEffects()
+    }
+
+    abstract class AbstractCriticalEffect
+    class AttackBuffEffect
+    class CriticalEffect
+    class DragonBreathCriticalEffect
+    class DefendEffect
+    class RageEffect
+    class SmokeBombInvulnerabilityEffect
+    class StunEffect
+}
+
+package "Skill Layer" {
+    interface SpecialSkill {
+        + getName(): String
+        + requiresTarget(): boolean
+        + use(context: ActionContext, mode: SkillUseMode): ActionResult
+    }
+
+    enum SkillUseMode {
+        NORMAL
+        POWER_STONE_TRIGGER
+    }
+
+    class ShieldBashSkill
+    class ArcaneBlastSkill
+    class DragonBreathSkill
+}
+
+package "Level Layer" {
+    class Level {
+        - difficulty: Difficulty
+        - levelNumber: int
+        - initialWave: Wave
+        - backupWave: Wave
+        + getLevelNumber(): int
+        + getDifficulty(): Difficulty
+        + getInitialWave(): Wave
+        + getBackupWave(): Wave
+        + hasBackupWave(): boolean
+    }
+
+    class Wave {
+        - enemies: List<Enemy>
+        + getEnemies(): List<Enemy>
+        + isEmpty(): boolean
+    }
+
+    class LevelFactory {
+        + create(levelNumber: int): Level
+    }
+
+    class SpawnManager {
+        - level: Level
+        - ui: BattleUI
+        + spawnInitialWave(context: BattleState)
+        + triggerBackupIfReady(context: BattleState): boolean
+        + hasBackupWave(): boolean
+    }
+
+    enum Difficulty {
+        EASY
+        MEDIUM
+        HARD
+        BOSS
+    }
+}
+
+' UI
+ConsoleBattleUI ..|> BattleUI
+
+' Controller
+GameController ..> BattleUI
+GameController ..> BattleEngine
+GameController ..> Level
+GameController ..> Player
+GameController ..> Inventory
+GameController ..> Item
+GameController ..> TurnOrderStrategy
+GameController ..> ActionResolver
+GameController ..> SpawnManager
+
+' Engine
+BattleEngine --> BattleState
+BattleEngine --> TurnManager
+BattleEngine --> SpawnManager
+BattleEngine ..> BattleUI
+BattleEngine ..> BattleOutcome
+
+TurnManager --> TurnOrderStrategy
+TurnManager --> ActionResolver
+TurnManager ..> BattleUI
+TurnManager ..> TurnResolution
+
+BattleState ..|> BattleContext
+BattleState --> Player
+BattleState --> Enemy
+
+EffectManager --> Combatant
+EffectManager --> BattleState
+
+' Strategy
+SpeedBasedTurnOrderStrategy ..|> TurnOrderStrategy
+BasicAttackEnemyActionStrategy ..|> EnemyActionStrategy
+DragonEnemyActionStrategy ..|> EnemyActionStrategy
+
+EnemyActionStrategy --> Enemy
+EnemyActionStrategy --> BattleContext
+EnemyActionStrategy --> CombatAction
+EnemyActionStrategy --> Combatant
+
+' Domain
+Combatant <|-- Player
+Combatant <|-- Enemy
+
+Player <|-- Warrior
+Player <|-- Wizard
+
+Enemy <|-- Goblin
+Enemy <|-- Wolf
+Enemy <|-- Dragon
+
+Player ..|> SpecialSkillUser
+Dragon ..|> SpecialSkillUser
+
+Enemy --> EnemyActionStrategy
+Player --> Inventory
+Player --> SpecialSkill
+Combatant --> StatusEffectManager
+
+' Action
+BasicAttackAction ..|> CombatAction
+DefendAction ..|> CombatAction
+UseItemAction ..|> CombatAction
+UseSpecialSkillAction ..|> CombatAction
+
+ActionContext --> Combatant
+ActionContext --> BattleContext
+ActionContext --> ActionResolver
+
+ActionResult --> Combatant
+
+UseItemAction --> Player
+UseItemAction --> Inventory
+
+UseSpecialSkillAction --> SpecialSkillUser
+UseSpecialSkillAction --> SpecialSkill
+
+' Item
+Inventory --> Item
+HealPotion ..|> Item
+PowerStone ..|> Item
+RagePotion ..|> Item
+SmokeBomb ..|> Item
+
+Item --> ActionContext
+Item --> ActionResult
+
+PowerStone --> Player
+PowerStone --> SpecialSkill
+
+' Effect
+StatusEffectManager --> StatusEffect
+
+StatusEffect <|-- AbstractCriticalEffect
+StatusEffect <|-- AttackBuffEffect
+StatusEffect <|-- DefendEffect
+StatusEffect <|-- RageEffect
+StatusEffect <|-- SmokeBombInvulnerabilityEffect
+StatusEffect <|-- StunEffect
+
+AbstractCriticalEffect <|-- CriticalEffect
+AbstractCriticalEffect <|-- DragonBreathCriticalEffect
+
+SmokeBombInvulnerabilityEffect --> Enemy
+
+' Skill
+ShieldBashSkill ..|> SpecialSkill
+ArcaneBlastSkill ..|> SpecialSkill
+DragonBreathSkill ..|> SpecialSkill
+
+SpecialSkill --> ActionContext
+SpecialSkill --> ActionResult
+SpecialSkill --> SkillUseMode
+
+ShieldBashSkill --> StunEffect
+ArcaneBlastSkill --> AttackBuffEffect
+DragonBreathSkill --> DragonBreathCriticalEffect
+
+' Level
+Level --> Wave
+Level --> Difficulty
+Wave --> Enemy
+
+LevelFactory ..> Level
+LevelFactory ..> Wave
+LevelFactory ..> Goblin
+LevelFactory ..> Wolf
+LevelFactory ..> Dragon
+
+SpawnManager --> Level
+SpawnManager --> BattleState
+SpawnManager ..> BattleUI
+
+@enduml

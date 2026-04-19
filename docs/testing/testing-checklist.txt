@@ -1,0 +1,172 @@
+SC2002 Turn-Based Combat Arena
+Testing Edge Cases Checklist
+
+
+Test Case 1: HP Boundary
+
+Input:
+Warrior HP = 10
+Enemy deals 20 damage
+
+Action:
+Enemy attacks Warrior
+
+Expected Result:
+Warrior HP = 0
+HP does not go below 0
+Warrior cannot act after being defeated
+
+Actual Result:
+Warrior HP reduced to 0
+HP did not go below 0
+Warrior was unable to act after defeat
+
+Conclusion:
+Pass
+
+
+Test Case 2: Potion Cap
+
+Input:
+Warrior HP = 180 / 200
+
+Action:
+Warrior uses Potion (+100 HP)
+
+Expected Result:
+Warrior HP = 200
+HP does not exceed maximum HP
+
+Actual Result:
+Warrior HP increased to 200
+HP did not exceed maximum limit
+
+Conclusion:
+Pass
+
+
+Test Case 3: Stun Effect Duration
+
+Input:
+Goblin is hit by Shield Bash
+
+Action:
+Apply stun effect
+
+Expected Result:
+Goblin skips current turn and next turn
+After duration ends, Goblin can act normally again
+
+Actual Result:
+Goblin skipped two turns (current + next)
+Goblin resumed normal actions after stun expired
+
+Conclusion:
+Pass
+
+
+Test Case 4: Smoke Bomb Effect
+
+Input:
+Smoke Bomb is used
+
+Action:
+Enemy attacks during effect duration
+
+Expected Result:
+Enemy attacks deal 0 damage
+Effect lasts for current turn and next turn only
+
+Actual Result:
+Enemy attacks (Goblin and Wolf) dealt 0 damage during effect
+Effect lasted exactly 2 turns (current + next)
+Damage returned to normal after effect ended
+
+Conclusion:
+Pass
+
+
+Test Case 5: Cooldown Reduction
+
+Input:
+Warrior uses Special Skill (cooldown = 3 turns)
+
+Action:
+Other combatants take their turns
+
+Expected Result:
+Cooldown does NOT decrease
+
+Actual Result:
+Cooldown remained unchanged during enemy turns
+
+Action:
+Warrior takes a turn
+
+Expected Result:
+Cooldown decreases by 1
+
+Actual Result:
+Cooldown reduced correctly after Warrior’s turn
+
+Conclusion:
+Pass
+
+
+Test Case 6: Backup Spawn
+
+Input:
+All initial enemies are defeated
+
+Action:
+Next round begins
+
+Expected Result:
+Backup enemies spawn
+All backup enemies appear simultaneously
+Backup does NOT trigger before all initial enemies are defeated
+
+Actual Result:
+Backup enemies spawned only after all initial enemies were defeated
+All backup enemies appeared at the same time
+No premature spawning observed
+
+Additional Observation:
+Easy Mode: No backup spawn
+Medium Mode: Backup spawn triggered correctly
+
+Conclusion:
+Pass
+
+
+Test Case 7: Dead Target Selection
+
+Input:
+Enemy HP = 0
+
+Action:
+Player attempts to target defeated enemy
+
+Expected Result:
+Defeated enemy cannot be selected as a target
+
+Actual Result:
+System prevented selection of defeated enemies
+Only valid targets were displayed
+
+Conclusion:
+Pass
+
+
+Final Summary:
+
+All tested edge cases behaved as expected.
+The system correctly handles:
+- HP boundaries
+- Item constraints
+- Status effects (Stun, Smoke Bomb)
+- Cooldown mechanics
+- Enemy spawning logic
+- Target validation
+
+Overall Testing Result: PASS
