@@ -207,6 +207,84 @@ Edge cases tested:
 
 ---
 
+## 🚀 How to Run
+
+### 📦 Prerequisites
+
+Ensure the following are installed:
+
+- Java JDK **25**
+- Maven
+
+Check versions:
+
+```bash
+java -version
+mvn -version
+```
+
+---
+
+### 🛠️ Compile the Project
+
+From the project root directory (where `pom.xml` is located), run:
+
+```bash
+mvn clean compile
+```
+
+---
+
+### ▶️ Run the Application
+
+```bash
+mvn exec:java
+```
+
+---
+
+### 🧪 Run Tests
+
+```bash
+mvn test
+```
+
+---
+
+### 🎮 How to Play
+
+1. Choose your character:
+   - Warrior
+   - Wizard
+
+2. Select two starting items:
+   - Heal Potion
+   - Power Stone
+   - Smoke Bomb
+   - Rage Potion
+
+3. Choose a difficulty level:
+   - Easy
+   - Medium
+   - Hard
+   - Boss
+
+4. During battle, choose one action per turn:
+   - Basic Attack
+   - Defend
+   - Use Item
+   - Use Special Skill
+
+---
+
+### ⚠️ Notes
+
+- The game runs entirely in the command line (CLI).
+- Input must be numeric; invalid input will prompt the user to re-enter a value.
+- Commands should be run from the project root directory.
+- This project is configured for **Java 25**. Using an older Java version may cause compilation or runtime errors.
+
+---
 ## 👨‍💻 Authors
 
 SC2002 Object-Oriented Design & Programming  
@@ -222,7 +300,7 @@ NTU AY25/26 Semester 2
 
 ## 🔗 Repository
 
-*(Insert your GitHub link here)*
+https://github.com/AidenWangYQ/sc2002grpproject
 
 ---
 
