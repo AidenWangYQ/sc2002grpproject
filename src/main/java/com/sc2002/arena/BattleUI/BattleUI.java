@@ -10,7 +10,7 @@ import com.sc2002.arena.combatant.Player;
 import com.sc2002.arena.engine.BattleState;
 import com.sc2002.arena.item.Inventory;
 
-public interface BattleUI {
+public interface BattleUI { //Interface used to keep track of what methods i should implement for ConsoleBattleUI.
     void printMessage(String message);
 
     void printRoundHeader(int roundNumber);

@@ -9,57 +9,95 @@ import com.sc2002.arena.effect.DragonBreathCriticalEffect;
 import com.sc2002.arena.engine.ActionResolver;
 import com.sc2002.arena.strategy.BattleContext;
 
+/**
+ * A multi-target special skill that performs a guaranteed critical attack
+ * against all living opponents.
+ *
+ * Responsibilities:
+ * - apply guaranteed critical attack setup
+ * - deal damage to all living enemies
+ * - record damage and defeat events
+ */
 public final class DragonBreathSkill implements SpecialSkill {
+
+    /** @return skill name for UI and logging */
     @Override
     public String getName() {
         return "Dragon Breath";
     }
 
+    /** @return false as targeting is handled internally */
     @Override
     public boolean requiresTarget() {
         return false;
     }
 
+    /**
+     * Executes Dragon Breath on all living opponents.
+     *
+     * @param context execution data
+     * @param mode skill usage mode
+     * @return result containing all damage and effects
+     */
     @Override
     public ActionResult use(ActionContext context, SkillUseMode mode) {
         Combatant actor = context.getActor();
         BattleContext battleContext = context.getBattleContext();
+
         List<Combatant> targets = battleContext.getLivingOpponentsOf(actor);
+
         if (targets.isEmpty()) {
             throw new IllegalStateException("Dragon Breath requires at least one living opponent.");
         }
 
         ActionResult result = ActionResult.forAction(actor, getName());
+
         ActionResolver actionResolver = context.getActionResolver();
-        ActionResolver.PreparedAttack preparedAttack = actionResolver.prepareGuaranteedCriticalAttack(
-                actor,
-                battleContext,
-                result,
-                new DragonBreathCriticalEffect(),
-                "Dragon Breath Critical x1.5",
-                "Dragon Breath lands a guaranteed critical hit."
-        );
+
+        ActionResolver.PreparedAttack preparedAttack =
+                actionResolver.prepareGuaranteedCriticalAttack(
+                        actor,
+                        battleContext,
+                        result,
+                        new DragonBreathCriticalEffect(),
+                        "Dragon Breath Critical x1.5",
+                        "Dragon Breath lands a guaranteed critical hit."
+                );
 
         for (Combatant target : targets) {
+
             if (!target.isAlive()) {
                 continue;
             }
-            ActionResolver.DamageResolution damage = actionResolver.applyDamage(
+
+            ActionResolver.DamageResolution damage =
+                    actionResolver.applyDamage(
+                            actor,
+                            target,
+                            preparedAttack.attackValue(),
+                            battleContext
+                    );
+
+            result.recordDamage(
                     actor,
                     target,
-                    preparedAttack.attackValue(),
-                    battleContext
+                    damage.beforeHp(),
+                    damage.rawDamage(),
+                    damage.appliedDamage(),
+                    damage.afterHp()
             );
-            result.recordDamage(actor, target, damage.beforeHp(), damage.rawDamage(), damage.appliedDamage(), damage.afterHp());
+
             if (!target.isAlive()) {
                 result.recordDefeat(target);
             }
         }
 
         result.recordNote("Dragon Breath scorches all living opponents.");
+
         if (mode == SkillUseMode.POWER_STONE_TRIGGER) {
             result.recordNote("Triggered by Power Stone.");
         }
+
         return result;
     }
 }
