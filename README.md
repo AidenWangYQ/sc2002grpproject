@@ -247,13 +247,7 @@ mvn exec:java
 
 If Maven execution does not work, you can run the program manually:
 
-#### Step 1: Compile (if not already done)
-
-```bash
-mvn clean compile
-```
-
-#### Step 2: Run using Java
+#### Step 1: Run using Java
 
 ```bash
 java -cp target/classes com.sc2002.arena.Main
