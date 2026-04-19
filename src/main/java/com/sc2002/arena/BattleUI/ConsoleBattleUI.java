@@ -1,4 +1,4 @@
-package com.sc2002.arena.battleUI;
+package com.sc2002.arena.BattleUI;
 
 import java.util.List;
 import java.util.Scanner;
@@ -40,9 +40,13 @@ public class ConsoleBattleUI implements BattleUI {
 
     @Override
     public void printActionResult(ActionResult result) {
-        System.out.println(result.getActor().getName() + " used " + result.getActionName() + ".");
+        System.out.println("--------------Action Result--------------");
+        System.out.println("-->" + result.getActor().getName() + " used " + result.getActionName() + ".");
+        for (ActionResult.EffectEvent event : result.getEffectEvents()) {
+            System.out.printf("  %s gained effect: %s.%n", event.target().getName(), event.effectName());
+        }
         for (ActionResult.DamageEvent event : result.getDamageEvents()) {
-            System.out.printf("  %s took %d damage (%d -> %d).%n",
+            System.out.printf("-->  %s took %d damage (%d -> %d).%n",
                     event.target().getName(),
                     event.appliedDamage(),
                     event.beforeHp(),
@@ -54,9 +58,6 @@ public class ConsoleBattleUI implements BattleUI {
                     event.healedAmount(),
                     event.beforeHp(),
                     event.afterHp());
-        }
-        for (ActionResult.EffectEvent event : result.getEffectEvents()) {
-            System.out.printf("  %s gained effect: %s.%n", event.target().getName(), event.effectName());
         }
         for (ActionResult.DefeatEvent event : result.getDefeatEvents()) {
             System.out.println("  " + event.target().getName() + " was defeated.");
@@ -78,14 +79,14 @@ public class ConsoleBattleUI implements BattleUI {
 
     @Override
     public void printCannotAct(Combatant combatant) {
-        System.out.println(combatant.getName() + " cannot act this turn.");
+        System.out.println("-->"+ combatant.getName() + " cannot act this turn.");
     }
 
     @Override
     public void printBackupSpawn(List<Enemy> backup) {
         System.out.println("Backup wave has arrived.");
         for (Enemy enemy : backup) {
-            System.out.println("  " + enemy.getName());
+            System.out.println("+" + enemy.getName());
         }
     }
 
@@ -155,7 +156,7 @@ public class ConsoleBattleUI implements BattleUI {
         return availableSlots.get(readIntInRange(1, availableSlots.size()) - 1).index();
     }
 
-    private int readIntInRange(int min, int max) {
+    public int readIntInRange(int min, int max) {
         while (true) {
             try {
                 int value = Integer.parseInt(scanner.nextLine().trim());
@@ -168,7 +169,7 @@ public class ConsoleBattleUI implements BattleUI {
         }
     }
 
-    private String formatCombatantStatus(Combatant combatant) {
+    public String formatCombatantStatus(Combatant combatant) {
         StringBuilder status = new StringBuilder();
         status.append(combatant.getName())
                 .append(" HP ")
